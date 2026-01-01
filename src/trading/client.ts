@@ -1,8 +1,9 @@
 import type { TradingClientConfig } from '../types/config.js';
 import { getTradingEndpoint } from '../types/config.js';
+import { BaseClient } from '../base/index.js';
 import { buildAuthNAuthHeaders, validateAuthNAuthConfig } from '../auth/auth-n-auth.js';
 import { buildTradingRequest, parseTradingResponse } from '../utils/xml.js';
-import { httpPost, type RetryConfig, DEFAULT_RETRY_CONFIG } from '../utils/http.js';
+import { httpPost } from '../utils/http.js';
 import { ApiError, type EbayApiErrorDetail } from '../errors/api-error.js';
 
 import type {
@@ -52,19 +53,16 @@ const DEFAULT_COMPATIBILITY_LEVEL = 1225;
  * const status = await client.getTokenStatus();
  * ```
  */
-export class TradingClient {
-  private readonly config: TradingClientConfig;
+export class TradingClient extends BaseClient<TradingClientConfig> {
   private readonly endpoint: string;
   private readonly compatibilityLevel: number;
-  private readonly retryConfig: RetryConfig;
 
   constructor(config: TradingClientConfig) {
+    super(config);
     validateAuthNAuthConfig(config.auth);
 
-    this.config = config;
     this.endpoint = getTradingEndpoint(config.sandbox);
     this.compatibilityLevel = config.compatibilityLevel ?? DEFAULT_COMPATIBILITY_LEVEL;
-    this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config.retry };
   }
 
   /**
@@ -232,12 +230,5 @@ export class TradingClient {
    */
   getEndpoint(): string {
     return this.endpoint;
-  }
-
-  /**
-   * Check if client is configured for sandbox.
-   */
-  isSandbox(): boolean {
-    return this.config.sandbox;
   }
 }
