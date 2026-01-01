@@ -3,12 +3,12 @@ export { BaseClient, BaseRestClient } from './base/index.js';
 export type { BaseClientConfig, RestClientConfig, RestApiError } from './base/index.js';
 
 // Main client exports
-export { TradingClient } from './trading/index.js';
-export { FulfillmentClient } from './fulfillment/index.js';
-export { InventoryClient } from './inventory/index.js';
-export { AccountClient } from './account/index.js';
-export { TaxonomyClient } from './taxonomy/index.js';
-export { ComplianceClient } from './compliance/index.js';
+export { TradingClient } from './clients/trading.js';
+export { FulfillmentClient } from './clients/fulfillment.js';
+export { InventoryClient } from './clients/inventory.js';
+export { AccountClient } from './clients/account.js';
+export { TaxonomyClient } from './clients/taxonomy.js';
+export { ComplianceClient } from './clients/compliance.js';
 
 // Notification handling
 export {

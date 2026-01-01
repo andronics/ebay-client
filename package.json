@@ -14,29 +14,33 @@
       "types": "./dist/base/index.d.ts",
       "import": "./dist/base/index.js"
     },
+    "./clients": {
+      "types": "./dist/clients/index.d.ts",
+      "import": "./dist/clients/index.js"
+    },
     "./trading": {
-      "types": "./dist/trading/index.d.ts",
-      "import": "./dist/trading/index.js"
+      "types": "./dist/clients/trading.d.ts",
+      "import": "./dist/clients/trading.js"
     },
     "./fulfillment": {
-      "types": "./dist/fulfillment/index.d.ts",
-      "import": "./dist/fulfillment/index.js"
+      "types": "./dist/clients/fulfillment.d.ts",
+      "import": "./dist/clients/fulfillment.js"
     },
     "./inventory": {
-      "types": "./dist/inventory/index.d.ts",
-      "import": "./dist/inventory/index.js"
+      "types": "./dist/clients/inventory.d.ts",
+      "import": "./dist/clients/inventory.js"
     },
     "./account": {
-      "types": "./dist/account/index.d.ts",
-      "import": "./dist/account/index.js"
+      "types": "./dist/clients/account.d.ts",
+      "import": "./dist/clients/account.js"
     },
     "./taxonomy": {
-      "types": "./dist/taxonomy/index.d.ts",
-      "import": "./dist/taxonomy/index.js"
+      "types": "./dist/clients/taxonomy.d.ts",
+      "import": "./dist/clients/taxonomy.js"
     },
     "./compliance": {
-      "types": "./dist/compliance/index.d.ts",
-      "import": "./dist/compliance/index.js"
+      "types": "./dist/clients/compliance.d.ts",
+      "import": "./dist/clients/compliance.js"
     },
     "./notifications": {
       "types": "./dist/notifications/index.d.ts",
