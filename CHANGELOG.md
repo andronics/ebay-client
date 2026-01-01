@@ -1,3 +1,12 @@
+# [1.2.0](https://github.com/andronics/ebay-client/compare/v1.1.0...v1.2.0) (2026-01-01)
+
+
+### Features
+
+* **base:** add BaseClient and BaseRestClient abstract classes ([6bd24d8](https://github.com/andronics/ebay-client/commit/6bd24d8ada350860798754b77a08e6c7a066ac97))
+* **compliance:** add type generation and curated types ([ec592c8](https://github.com/andronics/ebay-client/commit/ec592c846e6a4f9a5330c41ac14aa74de125f666))
+* **compliance:** implement ComplianceClient with operations ([a21ef65](https://github.com/andronics/ebay-client/commit/a21ef65abd7aa5532e2a3546c223cf3a277279a9))
+
 # [1.1.0](https://github.com/andronics/ebay-client/compare/v1.0.0...v1.1.0) (2026-01-01)
 
 
