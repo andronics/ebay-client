@@ -14,6 +14,7 @@
    - Inventory API (modern REST-based)
    - Account API (modern REST-based)
    - Taxonomy API (modern REST-based)
+   - Compliance API (modern REST-based)
 
 2. **Inbound** - Handle eBay notifications
    - Parse notification XML
@@ -38,6 +39,7 @@
 ├── inventory/      → InventoryClient (REST)
 ├── account/        → AccountClient (REST)
 ├── taxonomy/       → TaxonomyClient (REST)
+├── compliance/     → ComplianceClient (REST)
 ├── notifications/  → Parse, validate, verify inbound events
 ├── auth/           → Auth'n'Auth + OAuth implementations
 ├── types/          → Clean WSDL/OpenAPI-generated types
@@ -62,9 +64,9 @@
     ├─ request<T>()                   ├─ siteId, compatLevel
     └─ getBaseUrl(): string           └─ execute<T>()
           │
-    ┌─────┼─────┬─────────┬───────────┐
-    │     │     │         │           │
-Fulfillment Inventory Account Taxonomy [Future APIs]
+    ┌─────┼─────┬─────────┬───────────┬───────────┐
+    │     │     │         │           │           │
+Fulfillment Inventory Account Taxonomy Compliance [Future APIs]
 ```
 
 ### Module Relationships
@@ -81,7 +83,8 @@ Consumer Code
      │   (Fulfillment,       │   ├── base/BaseClient
      │    Inventory,         │   ├── auth/oauth
      │    Account,           │   └── utils/http
-     │    Taxonomy)          └── errors/
+     │    Taxonomy,          └── errors/
+     │    Compliance)
      │
      └── notifications/ ─────┬── utils/xml
               │              └── errors/
@@ -202,6 +205,34 @@ Headers:
 3. Get item aspects for the selected category
 4. Use aspects to populate ItemSpecifics in listings
 
+### Compliance API (Modern REST)
+
+REST API for checking and retrieving listing policy violations:
+
+```
+GET https://api.ebay.com/sell/compliance/v1/listing_violation_summary
+Headers:
+  Authorization: Bearer <access-token>
+  X-EBAY-C-MARKETPLACE-ID: EBAY_GB
+  Content-Type: application/json
+```
+
+**Compliance types:**
+- HTTPS - Non-secure HTTP links in listings
+- OUTSIDE_EBAY_BUYING_AND_SELLING - Phone numbers, email addresses, external links
+- RETURNS_POLICY - Unsupported return periods
+- ASPECTS_ADOPTION - Missing or invalid item aspects (deprecated Sept 2025)
+
+**Operations:**
+- Get violation summary (counts by marketplace/compliance type)
+- Get detailed violations with pagination and filtering
+
+**Compliance checking workflow:**
+1. Get violation summary to see overall counts
+2. For each compliance type with violations, get detailed listing violations
+3. Filter by compliance state (OUT_OF_COMPLIANCE or AT_RISK)
+4. Fix violations in listings and recheck
+
 ### Notification Flow
 
 eBay sends platform notifications as XML POSTs:
@@ -236,6 +267,7 @@ npm run generate:fulfillment  # Fulfillment API (OpenAPI)
 npm run generate:inventory    # Inventory API (OpenAPI)
 npm run generate:account      # Account API (OpenAPI)
 npm run generate:taxonomy     # Taxonomy API (OpenAPI)
+npm run generate:compliance   # Compliance API (OpenAPI)
 npm run generate:all          # All APIs
 ```
 
@@ -275,6 +307,13 @@ npm run generate:all          # All APIs
 2. Add operation method to `src/taxonomy/client.ts`
 3. Export from `src/taxonomy/index.ts`
 4. Add tests in `tests/unit/taxonomy/` and `tests/integration/mock/taxonomy.test.ts`
+
+### Adding a New Compliance Operation
+
+1. Add request/response types to `src/types/compliance/`
+2. Add operation method to `src/compliance/client.ts`
+3. Export from `src/compliance/index.ts`
+4. Add tests in `tests/unit/compliance/` and `tests/integration/mock/compliance.test.ts`
 
 ### Adding a New Notification Event Type
 
@@ -329,6 +368,14 @@ npm run generate:taxonomy
 - Uses `openapi-typescript` to generate types
 - Output: `src/types/taxonomy/generated/`
 
+**Compliance API (OpenAPI → TypeScript)**
+```bash
+npm run generate:compliance
+```
+- Downloads OpenAPI spec from eBay Developer Portal
+- Uses `openapi-typescript` to generate types
+- Output: `src/types/compliance/generated/`
+
 **All APIs at once:**
 ```bash
 npm run generate:all
@@ -341,6 +388,7 @@ import { Generated } from '@andronics/ebay-client/types/fulfillment';
 import { Generated } from '@andronics/ebay-client/types/inventory';
 import { Generated } from '@andronics/ebay-client/types/account';
 import { Generated } from '@andronics/ebay-client/types/taxonomy';
+import { Generated } from '@andronics/ebay-client/types/compliance';
 ```
 
 ## Gotchas & Edge Cases
@@ -398,6 +446,9 @@ import { Generated } from '@andronics/ebay-client/types/taxonomy';
 │   ├── taxonomy/
 │   │   ├── index.ts
 │   │   └── client.ts               # TaxonomyClient (extends BaseRestClient)
+│   ├── compliance/
+│   │   ├── index.ts
+│   │   └── client.ts               # ComplianceClient (extends BaseRestClient)
 │   ├── notifications/
 │   │   ├── index.ts
 │   │   ├── parser.ts               # Parse notification XML
@@ -416,6 +467,7 @@ import { Generated } from '@andronics/ebay-client/types/taxonomy';
 │   │   ├── inventory/              # Inventory types + generated/
 │   │   ├── account/                # Account types + generated/
 │   │   ├── taxonomy/               # Taxonomy types + generated/
+│   │   ├── compliance/             # Compliance types + generated/
 │   │   └── notifications/          # Notification event types
 │   ├── errors/
 │   │   ├── index.ts
@@ -431,7 +483,8 @@ import { Generated } from '@andronics/ebay-client/types/taxonomy';
 │   ├── generate-fulfillment-types.ts # OpenAPI type generation
 │   ├── generate-inventory-types.ts # OpenAPI type generation
 │   ├── generate-account-types.ts   # OpenAPI type generation
-│   └── generate-taxonomy-types.ts  # OpenAPI type generation
+│   ├── generate-taxonomy-types.ts  # OpenAPI type generation
+│   └── generate-compliance-types.ts # OpenAPI type generation
 └── tests/
     ├── utils/
     │   └── test-helpers.ts         # Shared test utilities
@@ -441,6 +494,7 @@ import { Generated } from '@andronics/ebay-client/types/taxonomy';
     │   ├── inventory/
     │   ├── account/
     │   ├── taxonomy/
+    │   ├── compliance/
     │   └── notifications/
     └── integration/
         └── mock/
@@ -449,6 +503,7 @@ import { Generated } from '@andronics/ebay-client/types/taxonomy';
             ├── inventory.test.ts
             ├── account.test.ts
             ├── taxonomy.test.ts
+            ├── compliance.test.ts
             └── notifications.test.ts
 ```
 

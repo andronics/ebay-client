@@ -3,7 +3,7 @@
 [![CI](https://github.com/andronics/ebay-client/actions/workflows/ci.yml/badge.svg)](https://github.com/andronics/ebay-client/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@andronics/ebay-client.svg)](https://www.npmjs.com/package/@andronics/ebay-client)
 
-A pure TypeScript library for eBay API integration. Supports Trading API (XML), Fulfillment API (REST), Inventory API (REST), Account API (REST), and Taxonomy API (REST), plus inbound notification handling.
+A pure TypeScript library for eBay API integration. Supports Trading API (XML), Fulfillment API (REST), Inventory API (REST), Account API (REST), Taxonomy API (REST), and Compliance API (REST), plus inbound notification handling.
 
 **This is a library, not a server.** Use it in your serverless functions, Express apps, or any Node.js environment.
 
@@ -219,6 +219,59 @@ await account.updateFulfillmentPolicy(fulfillmentPolicyId, {
 await account.deleteFulfillmentPolicy(fulfillmentPolicyId);
 ```
 
+### Compliance API (Listing Policy Violations via REST)
+
+```typescript
+import { ComplianceClient } from '@andronics/ebay-client/compliance';
+
+const compliance = new ComplianceClient({
+  sandbox: false,
+  auth: {
+    accessToken: 'your-access-token',
+  },
+});
+
+// Get a summary of listing violations for a marketplace
+const summary = await compliance.getListingViolationsSummary({
+  marketplaceId: 'EBAY_GB',
+});
+
+// Check counts by compliance type
+for (const item of summary?.violationSummaries ?? []) {
+  console.log(`${item.complianceType}: ${item.listingCount} violations`);
+}
+
+// Get detailed violations for a specific compliance type
+const violations = await compliance.getListingViolations({
+  marketplaceId: 'EBAY_GB',
+  complianceType: 'HTTPS',
+  limit: 100,
+});
+
+// Process each violation
+for (const listing of violations?.listingViolations ?? []) {
+  console.log(`Listing ${listing.listingId}:`);
+  for (const violation of listing.violations ?? []) {
+    console.log(`  - ${violation.message}`);
+    console.log(`    Reason: ${violation.reasonCode}`);
+    console.log(`    State: ${violation.complianceState}`);
+  }
+}
+
+// Filter by compliance state (OUT_OF_COMPLIANCE or AT_RISK)
+const criticalViolations = await compliance.getListingViolations({
+  marketplaceId: 'EBAY_GB',
+  complianceType: 'OUTSIDE_EBAY_BUYING_AND_SELLING',
+  complianceState: 'OUT_OF_COMPLIANCE',
+});
+
+// Get violations for multiple compliance types (summary only)
+const multiTypeSummary = await compliance.getListingViolationsSummary({
+  marketplaceId: 'EBAY_GB',
+  complianceType: ['HTTPS', 'RETURNS_POLICY', 'OUTSIDE_EBAY_BUYING_AND_SELLING'],
+});
+```
+
 ### Taxonomy API (Category Discovery via REST)
 
 ```typescript
@@ -406,6 +459,19 @@ interface TaxonomyClientConfig {
 }
 ```
 
+### Compliance Client Config
+
+```typescript
+interface ComplianceClientConfig {
+  sandbox: boolean;
+  auth: OAuthConfig;
+  retry?: {
+    maxRetries: number;
+    delayMs: number;
+  };
+}
+```
+
 ## Type Imports
 
 The library exports clean, typed interfaces generated from eBay's specs:
@@ -442,6 +508,16 @@ import type {
   AspectMetadata,
 } from '@andronics/ebay-client/types/taxonomy';
 
+// Import compliance types
+import type {
+  ComplianceType,
+  ComplianceState,
+  ComplianceSummary,
+  ComplianceViolation,
+  ComplianceDetail,
+  PagedComplianceViolationCollection,
+} from '@andronics/ebay-client/types/compliance';
+
 // Import notification types
 import type {
   EbayNotification,
@@ -454,6 +530,7 @@ import type * as Trading from '@andronics/ebay-client/types/trading';
 import type * as Inventory from '@andronics/ebay-client/types/inventory';
 import type * as Account from '@andronics/ebay-client/types/account';
 import type * as Taxonomy from '@andronics/ebay-client/types/taxonomy';
+import type * as Compliance from '@andronics/ebay-client/types/compliance';
 ```
 
 ## Error Handling
@@ -555,6 +632,13 @@ try {
 | `fetchItemAspects(categoryTreeId)` | Fetch all aspects for all leaf categories |
 | `getCompatibilityProperties(params)` | Get vehicle parts compatibility properties |
 | `getCompatibilityPropertyValues(params)` | Get values for a compatibility property |
+
+### ComplianceClient Methods
+
+| Method | Description |
+|--------|-------------|
+| `getListingViolationsSummary(params)` | Get violation counts by marketplace and compliance type |
+| `getListingViolations(params)` | Get detailed listing violations for a compliance type |
 
 ### Notification Functions
 
