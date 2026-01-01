@@ -22,6 +22,10 @@
       "types": "./dist/inventory/index.d.ts",
       "import": "./dist/inventory/index.js"
     },
+    "./account": {
+      "types": "./dist/account/index.d.ts",
+      "import": "./dist/account/index.js"
+    },
     "./notifications": {
       "types": "./dist/notifications/index.d.ts",
       "import": "./dist/notifications/index.js"
@@ -45,6 +49,10 @@
     "./types/inventory": {
       "types": "./dist/types/inventory/index.d.ts",
       "import": "./dist/types/inventory/index.js"
+    },
+    "./types/account": {
+      "types": "./dist/types/account/index.d.ts",
+      "import": "./dist/types/account/index.js"
     },
     "./types/notifications": {
       "types": "./dist/types/notifications/index.d.ts",
@@ -75,7 +83,8 @@
     "generate:trading": "tsx scripts/generate-trading-types.ts",
     "generate:fulfillment": "tsx scripts/generate-fulfillment-types.ts",
     "generate:inventory": "tsx scripts/generate-inventory-types.ts",
-    "generate:all": "npm run generate:trading && npm run generate:fulfillment && npm run generate:inventory",
+    "generate:account": "tsx scripts/generate-account-types.ts",
+    "generate:all": "npm run generate:trading && npm run generate:fulfillment && npm run generate:inventory && npm run generate:account",
     "prepublishOnly": "npm run clean && npm run build",
     "prepare": "husky"
   },
