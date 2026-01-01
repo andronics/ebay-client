@@ -2,6 +2,7 @@
 export { TradingClient } from './trading/index.js';
 export { FulfillmentClient } from './fulfillment/index.js';
 export { InventoryClient } from './inventory/index.js';
+export { AccountClient } from './account/index.js';
 
 // Notification handling
 export {
@@ -40,6 +41,7 @@ export {
   getTradingEndpoint,
   getFulfillmentEndpoint,
   getInventoryEndpoint,
+  getAccountEndpoint,
 } from './types/config.js';
 
 // Re-export key types
@@ -50,6 +52,7 @@ export type {
   TradingClientConfig,
   FulfillmentClientConfig,
   InventoryClientConfig,
+  AccountClientConfig,
 
   // Trading
   AddItemRequest,
@@ -78,6 +81,21 @@ export type {
   CreateOfferResponse,
   UpdateOfferRequest,
   PublishOfferResponse,
+
+  // Account
+  FulfillmentPolicy,
+  FulfillmentPolicyRequest,
+  SetFulfillmentPolicyResponse,
+  FulfillmentPoliciesResponse,
+  PaymentPolicy,
+  PaymentPolicyRequest,
+  SetPaymentPolicyResponse,
+  PaymentPoliciesResponse,
+  ReturnPolicy,
+  ReturnPolicyRequest,
+  SetReturnPolicyResponse,
+  ReturnPoliciesResponse,
+  SellingPrivileges,
 
   // Notifications
   EbayNotification,
