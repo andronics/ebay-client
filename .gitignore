@@ -44,8 +44,8 @@ pnpm-debug.log*
 # WSDL files (downloaded, not committed)
 wsdl/
 
-# Generated types (re-generated from WSDL)
-src/types/trading/generated/
+# Generated types are now committed for dev-time reference
+# Regenerate with: npm run generate:types
 
 # Temporary files
 *.tmp

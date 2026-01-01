@@ -48,3 +48,7 @@ export type {
   SetNotificationPreferencesResponse,
   GetNotificationPreferencesResponse,
 } from './responses.js';
+
+// Full WSDL-generated types (for reference during development)
+// These provide complete eBay schema coverage
+export * as Generated from './generated/index.js';
