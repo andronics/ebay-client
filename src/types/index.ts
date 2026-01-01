@@ -7,6 +7,7 @@ export type {
   FulfillmentClientConfig,
   InventoryClientConfig,
   AccountClientConfig,
+  TaxonomyClientConfig,
   EbaySiteIdValue,
 } from './config.js';
 
@@ -16,6 +17,7 @@ export {
   getFulfillmentEndpoint,
   getInventoryEndpoint,
   getAccountEndpoint,
+  getTaxonomyEndpoint,
 } from './config.js';
 
 // Trading types (Generated namespace excluded - import from types/trading directly)
@@ -141,6 +143,36 @@ export type {
   SellingPrivileges,
   SellingLimit,
 } from './account/index.js';
+
+// Taxonomy types (Generated namespace excluded - import from types/taxonomy directly)
+export type {
+  MarketplaceId,
+  BaseCategoryTree,
+  Category,
+  CategoryTreeNode,
+  CategoryTree,
+  CategorySubtree,
+  AncestorReference,
+  CategorySuggestion,
+  CategorySuggestionResponse,
+  ExpiredCategory,
+  ExpiredCategoriesResponse,
+  AspectDataType,
+  AspectMode,
+  AspectUsage,
+  ItemToAspectCardinality,
+  ValueConstraint,
+  AspectValue,
+  AspectConstraint,
+  Aspect,
+  AspectMetadata,
+  CategoryAspect,
+  GetCategoriesAspectResponse,
+  CompatibilityProperty,
+  GetCompatibilityPropertiesResponse,
+  CompatibilityPropertyValue,
+  GetCompatibilityPropertyValuesResponse,
+} from './taxonomy/index.js';
 
 // Notification types
 export * from './notifications/index.js';

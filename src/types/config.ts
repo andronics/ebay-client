@@ -104,6 +104,18 @@ export interface AccountClientConfig {
 }
 
 /**
+ * Taxonomy API client configuration.
+ */
+export interface TaxonomyClientConfig {
+  /** Use sandbox (true) or production (false) environment */
+  sandbox: boolean;
+  /** Authentication configuration */
+  auth: OAuthConfig;
+  /** Retry configuration */
+  retry?: Partial<RetryConfig>;
+}
+
+/**
  * Get the eBay Trading API endpoint URL.
  */
 export function getTradingEndpoint(sandbox: boolean): string {
@@ -137,4 +149,13 @@ export function getAccountEndpoint(sandbox: boolean): string {
   return sandbox
     ? 'https://api.sandbox.ebay.com/sell/account/v1'
     : 'https://api.ebay.com/sell/account/v1';
+}
+
+/**
+ * Get the eBay Taxonomy API base URL.
+ */
+export function getTaxonomyEndpoint(sandbox: boolean): string {
+  return sandbox
+    ? 'https://api.sandbox.ebay.com/commerce/taxonomy/v1'
+    : 'https://api.ebay.com/commerce/taxonomy/v1';
 }
