@@ -26,6 +26,10 @@
       "types": "./dist/account/index.d.ts",
       "import": "./dist/account/index.js"
     },
+    "./taxonomy": {
+      "types": "./dist/taxonomy/index.d.ts",
+      "import": "./dist/taxonomy/index.js"
+    },
     "./notifications": {
       "types": "./dist/notifications/index.d.ts",
       "import": "./dist/notifications/index.js"
@@ -53,6 +57,10 @@
     "./types/account": {
       "types": "./dist/types/account/index.d.ts",
       "import": "./dist/types/account/index.js"
+    },
+    "./types/taxonomy": {
+      "types": "./dist/types/taxonomy/index.d.ts",
+      "import": "./dist/types/taxonomy/index.js"
     },
     "./types/notifications": {
       "types": "./dist/types/notifications/index.d.ts",
@@ -84,7 +92,8 @@
     "generate:fulfillment": "tsx scripts/generate-fulfillment-types.ts",
     "generate:inventory": "tsx scripts/generate-inventory-types.ts",
     "generate:account": "tsx scripts/generate-account-types.ts",
-    "generate:all": "npm run generate:trading && npm run generate:fulfillment && npm run generate:inventory && npm run generate:account",
+    "generate:taxonomy": "tsx scripts/generate-taxonomy-types.ts",
+    "generate:all": "npm run generate:trading && npm run generate:fulfillment && npm run generate:inventory && npm run generate:account && npm run generate:taxonomy",
     "prepublishOnly": "npm run clean && npm run build",
     "prepare": "husky"
   },

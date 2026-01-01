@@ -3,7 +3,7 @@
 [![CI](https://github.com/andronics/ebay-client/actions/workflows/ci.yml/badge.svg)](https://github.com/andronics/ebay-client/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@andronics/ebay-client.svg)](https://www.npmjs.com/package/@andronics/ebay-client)
 
-A pure TypeScript library for eBay API integration. Supports Trading API (XML), Fulfillment API (REST), Inventory API (REST), and Account API (REST), plus inbound notification handling.
+A pure TypeScript library for eBay API integration. Supports Trading API (XML), Fulfillment API (REST), Inventory API (REST), Account API (REST), and Taxonomy API (REST), plus inbound notification handling.
 
 **This is a library, not a server.** Use it in your serverless functions, Express apps, or any Node.js environment.
 
@@ -219,6 +219,63 @@ await account.updateFulfillmentPolicy(fulfillmentPolicyId, {
 await account.deleteFulfillmentPolicy(fulfillmentPolicyId);
 ```
 
+### Taxonomy API (Category Discovery via REST)
+
+```typescript
+import { TaxonomyClient } from '@andronics/ebay-client/taxonomy';
+
+const taxonomy = new TaxonomyClient({
+  sandbox: false,
+  auth: {
+    accessToken: 'your-access-token',
+  },
+});
+
+// Get the default category tree ID for a marketplace
+const { categoryTreeId } = await taxonomy.getDefaultCategoryTreeId('EBAY_GB');
+
+// Get category suggestions based on product keywords
+const suggestions = await taxonomy.getCategorySuggestions({
+  categoryTreeId,
+  query: 'iPhone 15 Pro Max 256GB',
+});
+
+// The first suggestion is usually the best match
+const bestCategory = suggestions.categorySuggestions?.[0];
+console.log('Category:', bestCategory?.category?.categoryName);
+console.log('Category ID:', bestCategory?.category?.categoryId);
+
+// Get required/recommended aspects (attributes) for the category
+const aspects = await taxonomy.getItemAspectsForCategory({
+  categoryTreeId,
+  categoryId: bestCategory?.category?.categoryId!,
+});
+
+// Find required aspects
+const requiredAspects = aspects.aspects?.filter(
+  a => a.aspectConstraint?.aspectRequired
+);
+console.log('Required aspects:', requiredAspects?.map(a => a.localizedAspectName));
+
+// Get valid values for an aspect (e.g., Brand)
+const brandAspect = aspects.aspects?.find(a => a.localizedAspectName === 'Brand');
+console.log('Valid brands:', brandAspect?.aspectValues?.map(v => v.localizedValue));
+
+// For vehicle parts: get compatibility properties
+const compatProps = await taxonomy.getCompatibilityProperties({
+  categoryTreeId: '100', // eBay Motors
+  categoryId: '6016',    // Car & Truck Parts
+});
+
+// Get Toyota models for 2018
+const models = await taxonomy.getCompatibilityPropertyValues({
+  categoryTreeId: '100',
+  categoryId: '6016',
+  compatibilityProperty: 'Model',
+  filter: 'Year:2018,Make:Toyota',
+});
+```
+
 ### Handling Notifications
 
 ```typescript
@@ -336,6 +393,19 @@ interface AccountClientConfig {
 }
 ```
 
+### Taxonomy Client Config
+
+```typescript
+interface TaxonomyClientConfig {
+  sandbox: boolean;
+  auth: OAuthConfig;
+  retry?: {
+    maxRetries: number;
+    delayMs: number;
+  };
+}
+```
+
 ## Type Imports
 
 The library exports clean, typed interfaces generated from eBay's specs:
@@ -364,6 +434,14 @@ import type {
   SellingPrivileges,
 } from '@andronics/ebay-client/types/account';
 
+// Import taxonomy types
+import type {
+  CategoryTree,
+  CategorySuggestionResponse,
+  Aspect,
+  AspectMetadata,
+} from '@andronics/ebay-client/types/taxonomy';
+
 // Import notification types
 import type {
   EbayNotification,
@@ -375,6 +453,7 @@ import type {
 import type * as Trading from '@andronics/ebay-client/types/trading';
 import type * as Inventory from '@andronics/ebay-client/types/inventory';
 import type * as Account from '@andronics/ebay-client/types/account';
+import type * as Taxonomy from '@andronics/ebay-client/types/taxonomy';
 ```
 
 ## Error Handling
@@ -462,6 +541,20 @@ try {
 | `updateReturnPolicy(policyId, policy)` | Update a return policy |
 | `deleteReturnPolicy(policyId)` | Delete a return policy |
 | `getPrivileges()` | Get seller privileges and selling limits |
+
+### TaxonomyClient Methods
+
+| Method | Description |
+|--------|-------------|
+| `getDefaultCategoryTreeId(marketplaceId)` | Get default category tree ID for a marketplace |
+| `getCategoryTree(categoryTreeId)` | Get the full category tree |
+| `getCategorySubtree(params)` | Get a subtree starting from a category |
+| `getCategorySuggestions(params)` | Get category suggestions based on keywords |
+| `getExpiredCategories(categoryTreeId)` | Get expired category mappings |
+| `getItemAspectsForCategory(params)` | Get aspects (attributes) for a leaf category |
+| `fetchItemAspects(categoryTreeId)` | Fetch all aspects for all leaf categories |
+| `getCompatibilityProperties(params)` | Get vehicle parts compatibility properties |
+| `getCompatibilityPropertyValues(params)` | Get values for a compatibility property |
 
 ### Notification Functions
 

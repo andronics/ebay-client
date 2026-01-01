@@ -2,11 +2,17 @@ import { setupServer } from 'msw/node';
 import { tradingHandlers } from './handlers/trading.js';
 import { inventoryHandlers } from './handlers/inventory.js';
 import { accountHandlers } from './handlers/account.js';
+import { taxonomyHandlers } from './handlers/taxonomy.js';
 
 /**
  * MSW server for mocking HTTP requests in integration tests.
  */
-export const server = setupServer(...tradingHandlers, ...inventoryHandlers, ...accountHandlers);
+export const server = setupServer(
+  ...tradingHandlers,
+  ...inventoryHandlers,
+  ...accountHandlers,
+  ...taxonomyHandlers
+);
 
 /**
  * Start MSW server before tests.
