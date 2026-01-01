@@ -85,6 +85,7 @@
     "@types/node": "^20.10.0",
     "@typescript-eslint/eslint-plugin": "^8.51.0",
     "@typescript-eslint/parser": "^8.51.0",
+    "@vitest/coverage-v8": "^1.6.1",
     "eslint": "^9.39.2",
     "openapi-typescript": "^7.10.1",
     "tsup": "^8.0.1",
