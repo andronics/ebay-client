@@ -3,7 +3,7 @@
 [![CI](https://github.com/andronics/ebay-client/actions/workflows/ci.yml/badge.svg)](https://github.com/andronics/ebay-client/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@andronics/ebay-client.svg)](https://www.npmjs.com/package/@andronics/ebay-client)
 
-A pure TypeScript library for eBay API integration. Supports both the Trading API (XML) and Fulfillment API (REST), plus inbound notification handling.
+A pure TypeScript library for eBay API integration. Supports Trading API (XML), Fulfillment API (REST), and Inventory API (REST), plus inbound notification handling.
 
 **This is a library, not a server.** Use it in your serverless functions, Express apps, or any Node.js environment.
 
@@ -81,6 +81,73 @@ await fulfillment.createShipment({
   trackingNumber: 'ABC123',
   carrier: 'ROYAL_MAIL',
 });
+```
+
+### Inventory API (Product & Offer Management via REST)
+
+```typescript
+import { InventoryClient } from '@andronics/ebay-client/inventory';
+
+const inventory = new InventoryClient({
+  sandbox: false,
+  auth: {
+    accessToken: 'your-access-token',
+  },
+});
+
+// Create or update an inventory item
+await inventory.createOrReplaceInventoryItem('MY-SKU-001', {
+  product: {
+    title: 'Premium Widget',
+    description: 'A high-quality widget for all your needs',
+    aspects: {
+      Brand: ['WidgetCo'],
+      Type: ['Standard'],
+    },
+    imageUrls: ['https://example.com/widget.jpg'],
+  },
+  condition: 'NEW',
+  availability: {
+    shipToLocationAvailability: {
+      quantity: 100,
+    },
+  },
+});
+
+// Get inventory item
+const item = await inventory.getInventoryItem('MY-SKU-001');
+
+// List all inventory items
+const items = await inventory.getInventoryItems({ limit: 50 });
+
+// Create an offer for the item
+const { offerId } = await inventory.createOffer({
+  sku: 'MY-SKU-001',
+  marketplaceId: 'EBAY_GB',
+  format: 'FIXED_PRICE',
+  listingPolicies: {
+    fulfillmentPolicyId: 'your-fulfillment-policy-id',
+    paymentPolicyId: 'your-payment-policy-id',
+    returnPolicyId: 'your-return-policy-id',
+  },
+  pricingSummary: {
+    price: { value: '29.99', currency: 'GBP' },
+  },
+  categoryId: '11450',
+});
+
+// Publish the offer (makes listing live)
+const { listingId } = await inventory.publishOffer(offerId);
+
+// Get/update offers
+const offer = await inventory.getOffer(offerId);
+const offers = await inventory.getOffers({ sku: 'MY-SKU-001' });
+await inventory.updateOffer(offerId, {
+  pricingSummary: { price: { value: '24.99', currency: 'GBP' } },
+});
+
+// Delete inventory item
+await inventory.deleteInventoryItem('MY-SKU-001');
 ```
 
 ### Handling Notifications
@@ -168,26 +235,44 @@ interface FulfillmentClientConfig {
 }
 
 interface OAuthConfig {
-  type: 'oauth';
   accessToken: string;
   refreshToken?: string;
   expiresAt?: Date;
 }
 ```
 
-## Type Imports
-
-The library exports clean, typed interfaces generated from eBay's WSDL:
+### Inventory Client Config
 
 ```typescript
-// Import specific types
+interface InventoryClientConfig {
+  sandbox: boolean;
+  auth: OAuthConfig;
+  retry?: {
+    maxRetries: number;
+    delayMs: number;
+  };
+}
+```
+
+## Type Imports
+
+The library exports clean, typed interfaces generated from eBay's specs:
+
+```typescript
+// Import trading types
 import type {
   AddItemRequest,
   AddItemResponse,
   Item,
-  ShippingDetails,
-  ItemSpecifics,
 } from '@andronics/ebay-client/types/trading';
+
+// Import inventory types
+import type {
+  InventoryItem,
+  Offer,
+  CreateOfferRequest,
+  CreateOfferResponse,
+} from '@andronics/ebay-client/types/inventory';
 
 // Import notification types
 import type {
@@ -196,8 +281,9 @@ import type {
   FixedPriceTransactionNotification,
 } from '@andronics/ebay-client/types/notifications';
 
-// Import all trading types
+// Import all types from a namespace
 import type * as Trading from '@andronics/ebay-client/types/trading';
+import type * as Inventory from '@andronics/ebay-client/types/inventory';
 ```
 
 ## Error Handling
@@ -250,6 +336,20 @@ try {
 | `getOrders(params)` | List orders with filtering |
 | `getOrder(params)` | Get specific order details |
 | `createShipment(request)` | Add shipment tracking |
+
+### InventoryClient Methods
+
+| Method | Description |
+|--------|-------------|
+| `createOrReplaceInventoryItem(sku, item)` | Create or update an inventory item |
+| `getInventoryItem(sku)` | Get inventory item by SKU |
+| `deleteInventoryItem(sku)` | Delete an inventory item |
+| `getInventoryItems(params)` | List inventory items with pagination |
+| `createOffer(offer)` | Create an offer for an inventory item |
+| `getOffer(offerId)` | Get offer details |
+| `updateOffer(offerId, offer)` | Update an existing offer |
+| `publishOffer(offerId)` | Publish offer to make listing live |
+| `getOffers(params)` | List offers for a SKU |
 
 ### Notification Functions
 
