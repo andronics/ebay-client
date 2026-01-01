@@ -1,5 +1,8 @@
 # @andronics/ebay-client
 
+[![CI](https://github.com/andronics/ebay-client/actions/workflows/ci.yml/badge.svg)](https://github.com/andronics/ebay-client/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@andronics/ebay-client.svg)](https://www.npmjs.com/package/@andronics/ebay-client)
+
 A pure TypeScript library for eBay API integration. Supports both the Trading API (XML) and Fulfillment API (REST), plus inbound notification handling.
 
 **This is a library, not a server.** Use it in your serverless functions, Express apps, or any Node.js environment.
