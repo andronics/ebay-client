@@ -659,7 +659,7 @@ describe('FulfillmentClient', () => {
 
       const client = new FulfillmentClient(createConfig());
 
-      await expect(client.getOrders()).rejects.toThrow('Fulfillment API error');
+      await expect(client.getOrders()).rejects.toThrow('eBay API error');
     });
 
     it('propagates HTTP errors', async () => {

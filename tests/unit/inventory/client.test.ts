@@ -716,7 +716,7 @@ describe('InventoryClient', () => {
         expect.fail('Should have thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(ApiError);
-        expect((error as ApiError).message).toBe('Inventory API error');
+        expect((error as ApiError).message).toBe('eBay API error');
       }
     });
   });

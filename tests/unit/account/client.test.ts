@@ -860,7 +860,7 @@ describe('AccountClient', () => {
         expect.fail('Should have thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(ApiError);
-        expect((error as ApiError).message).toBe('Account API error');
+        expect((error as ApiError).message).toBe('eBay API error');
       }
     });
   });

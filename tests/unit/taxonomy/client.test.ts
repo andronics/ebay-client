@@ -737,7 +737,7 @@ describe('TaxonomyClient', () => {
         expect.fail('Should have thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(ApiError);
-        expect((error as ApiError).message).toBe('Taxonomy API error');
+        expect((error as ApiError).message).toBe('eBay API error');
       }
     });
   });
