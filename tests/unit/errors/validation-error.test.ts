@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import { ValidationError } from '../../src/errors/validation-error.js';
-import { EbayError } from '../../src/errors/ebay-error.js';
+import { ValidationError } from '../../../src/errors/validation-error.js';
+import { EbayError } from '../../../src/errors/ebay-error.js';
 
 describe('ValidationError', () => {
   describe('constructor', () => {

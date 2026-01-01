@@ -4,8 +4,8 @@ import {
   isTokenExpired,
   validateOAuthConfig,
   OAuthScopes,
-} from '../../src/auth/oauth.js';
-import type { OAuthConfig } from '../../src/types/config.js';
+} from '../../../src/auth/oauth.js';
+import type { OAuthConfig } from '../../../src/types/config.js';
 
 describe('oauth', () => {
   describe('buildOAuthHeaders', () => {

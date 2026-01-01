@@ -4,8 +4,8 @@ import {
   httpGet,
   httpPost,
   DEFAULT_RETRY_CONFIG,
-} from '../../src/utils/http.js';
-import { EbayError } from '../../src/errors/ebay-error.js';
+} from '../../../src/utils/http.js';
+import { EbayError } from '../../../src/errors/ebay-error.js';
 
 // Mock fetch globally
 const mockFetch = vi.fn();

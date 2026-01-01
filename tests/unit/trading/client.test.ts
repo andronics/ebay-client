@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { TradingClient } from '../../src/trading/client.js';
-import { ApiError } from '../../src/errors/api-error.js';
-import { EbayError } from '../../src/errors/ebay-error.js';
-import type { TradingClientConfig } from '../../src/types/config.js';
-import * as http from '../../src/utils/http.js';
+import { TradingClient } from '../../../src/trading/client.js';
+import { ApiError } from '../../../src/errors/api-error.js';
+import { EbayError } from '../../../src/errors/ebay-error.js';
+import type { TradingClientConfig } from '../../../src/types/config.js';
+import * as http from '../../../src/utils/http.js';
 import * as fixtures from '../fixtures/trading-responses.js';
 
 // Mock the http module
-vi.mock('../../src/utils/http.js', async () => {
-  const actual = await vi.importActual<typeof http>('../../src/utils/http.js');
+vi.mock('../../../src/utils/http.js', async () => {
+  const actual = await vi.importActual<typeof http>('../../../src/utils/http.js');
   return {
     ...actual,
     httpPost: vi.fn(),

@@ -1,14 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { FulfillmentClient } from '../../src/fulfillment/client.js';
-import { ApiError } from '../../src/errors/api-error.js';
-import { EbayError } from '../../src/errors/ebay-error.js';
-import type { FulfillmentClientConfig } from '../../src/types/config.js';
-import * as http from '../../src/utils/http.js';
+import { FulfillmentClient } from '../../../src/fulfillment/client.js';
+import { ApiError } from '../../../src/errors/api-error.js';
+import { EbayError } from '../../../src/errors/ebay-error.js';
+import type { FulfillmentClientConfig } from '../../../src/types/config.js';
+import * as http from '../../../src/utils/http.js';
 import * as fixtures from '../fixtures/fulfillment-responses.js';
 
 // Mock the http module
-vi.mock('../../src/utils/http.js', async () => {
-  const actual = await vi.importActual<typeof http>('../../src/utils/http.js');
+vi.mock('../../../src/utils/http.js', async () => {
+  const actual = await vi.importActual<typeof http>('../../../src/utils/http.js');
   return {
     ...actual,
     httpRequest: vi.fn(),

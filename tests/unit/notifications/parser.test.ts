@@ -5,7 +5,7 @@ import {
   extractItem,
   extractTransaction,
   extractBuyer,
-} from '../../src/notifications/parser.js';
+} from '../../../src/notifications/parser.js';
 import * as fixtures from '../fixtures/notifications.js';
 
 describe('notifications/parser', () => {

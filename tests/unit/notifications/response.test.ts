@@ -5,7 +5,7 @@ import {
   ACK_RESPONSE_HEADERS,
   isChallengeRequest,
   getChallengeValue,
-} from '../../src/notifications/response.js';
+} from '../../../src/notifications/response.js';
 
 describe('notifications/response', () => {
   describe('buildAckResponse', () => {

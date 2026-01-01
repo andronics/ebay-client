@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   buildAuthNAuthHeaders,
   validateAuthNAuthConfig,
-} from '../../src/auth/auth-n-auth.js';
-import type { AuthNAuthConfig } from '../../src/types/config.js';
+} from '../../../src/auth/auth-n-auth.js';
+import type { AuthNAuthConfig } from '../../../src/types/config.js';
 
 const validConfig: AuthNAuthConfig = {
   appId: 'test-app-id',

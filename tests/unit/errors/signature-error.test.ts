@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { SignatureError } from '../../src/errors/signature-error.js';
-import { EbayError } from '../../src/errors/ebay-error.js';
+import { SignatureError } from '../../../src/errors/signature-error.js';
+import { EbayError } from '../../../src/errors/ebay-error.js';
 
 describe('SignatureError', () => {
   describe('constructor', () => {

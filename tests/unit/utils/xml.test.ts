@@ -6,7 +6,7 @@ import {
   buildXml,
   wrapCDATA,
   EBAY_NAMESPACE,
-} from '../../src/utils/xml.js';
+} from '../../../src/utils/xml.js';
 
 describe('xml utilities', () => {
   describe('EBAY_NAMESPACE', () => {

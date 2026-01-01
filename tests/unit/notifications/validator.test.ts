@@ -3,10 +3,10 @@ import {
   validateNotification,
   validateNotificationStrict,
   getSchemaForEvent,
-} from '../../src/notifications/validator.js';
-import { ValidationError } from '../../src/errors/validation-error.js';
-import { parseFullNotification } from '../../src/notifications/parser.js';
-import type { EbayNotification } from '../../src/types/notifications/index.js';
+} from '../../../src/notifications/validator.js';
+import { ValidationError } from '../../../src/errors/validation-error.js';
+import { parseFullNotification } from '../../../src/notifications/parser.js';
+import type { EbayNotification } from '../../../src/types/notifications/index.js';
 import * as fixtures from '../fixtures/notifications.js';
 
 describe('notifications/validator', () => {

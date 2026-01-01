@@ -3,8 +3,8 @@ import {
   verifySignature,
   extractSignatureFromXml,
   validateNotificationStructure,
-} from '../../src/notifications/signature.js';
-import { SignatureError } from '../../src/errors/signature-error.js';
+} from '../../../src/notifications/signature.js';
+import { SignatureError } from '../../../src/errors/signature-error.js';
 import * as fixtures from '../fixtures/notifications.js';
 
 describe('notifications/signature', () => {

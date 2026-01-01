@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { ApiError, type EbayApiErrorDetail } from '../../src/errors/api-error.js';
-import { EbayError } from '../../src/errors/ebay-error.js';
+import { ApiError, type EbayApiErrorDetail } from '../../../src/errors/api-error.js';
+import { EbayError } from '../../../src/errors/ebay-error.js';
 
 describe('ApiError', () => {
   describe('constructor', () => {
