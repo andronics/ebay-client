@@ -10,8 +10,14 @@ import * as fixtures from '../fixtures/notifications.js';
 
 describe('notifications/parser', () => {
   describe('parseNotification', () => {
-    // Note: SOAP-wrapped notifications don't currently parse correctly due to
-    // namespace prefix handling in parser.ts. Use direct format instead.
+    it('parses SOAP-wrapped notification', () => {
+      const result = parseNotification(fixtures.ITEM_SOLD_SOAP);
+
+      expect(result.eventType).toBe('ItemSold');
+      expect(result.timestamp).toBe('2024-01-15T10:30:00.000Z');
+      expect(result.recipientUserId).toBe('testseller123');
+    });
+
     it('parses direct (non-SOAP) notification', () => {
       const result = parseNotification(fixtures.ITEM_SOLD_DIRECT);
 
@@ -63,9 +69,6 @@ describe('notifications/parser', () => {
   });
 
   describe('extractItem', () => {
-    // Note: extractItem expects Item to be an object, but the XML parser
-    // forces Item to always be an array via isArray config. These tests
-    // use direct object input to test the extraction logic.
     it('extracts item from object body', () => {
       const body = {
         Item: {
@@ -80,6 +83,23 @@ describe('notifications/parser', () => {
             },
           },
         },
+      };
+      const item = extractItem(body);
+
+      expect(item).toBeDefined();
+      expect(item?.itemId).toBe('123456789012');
+      expect(item?.title).toBe('Test Product');
+    });
+
+    it('extracts item from array body (XML parser isArray handling)', () => {
+      // XML parser forces Item to be an array - extractItem handles this
+      const body = {
+        Item: [
+          {
+            ItemID: '123456789012',
+            Title: 'Test Product',
+          },
+        ],
       };
       const item = extractItem(body);
 
@@ -245,15 +265,20 @@ describe('notifications/parser', () => {
   });
 
   describe('parseFullNotification', () => {
-    // Note: Due to Item being forced to an array by XML parser config,
-    // extractItem doesn't work with parsed notifications. These tests
-    // verify the structure is correct.
     it('returns notification with base fields', () => {
       const result = parseFullNotification(fixtures.ITEM_SOLD_DIRECT);
 
       expect(result.eventType).toBe('ItemSold');
       expect(result.timestamp).toBeDefined();
       expect(result.recipientUserId).toBeDefined();
+    });
+
+    it('returns notification with extracted item', () => {
+      const result = parseFullNotification(fixtures.ITEM_SOLD_DIRECT);
+
+      expect(result.item).toBeDefined();
+      expect(result.item?.itemId).toBe('123456789012');
+      expect(result.item?.title).toBe('Test Product for Sale');
     });
 
     it('returns notification with extracted transaction', () => {
@@ -273,14 +298,24 @@ describe('notifications/parser', () => {
     it('returns undefined for missing extractions', () => {
       const result = parseFullNotification(fixtures.NOTIFICATION_NO_ITEM);
 
+      expect(result.item).toBeUndefined();
       expect(result.buyer).toBeUndefined();
       expect(result.transaction).toBeUndefined();
+    });
+
+    it('parses SOAP-wrapped notification correctly', () => {
+      const result = parseFullNotification(fixtures.ITEM_SOLD_SOAP);
+
+      expect(result.eventType).toBe('ItemSold');
+      expect(result.item).toBeDefined();
+      expect(result.item?.itemId).toBe('123456789012');
     });
 
     it('parses FixedPriceTransaction correctly', () => {
       const result = parseFullNotification(fixtures.FIXED_PRICE_TRANSACTION);
 
       expect(result.eventType).toBe('FixedPriceTransaction');
+      expect(result.item?.itemId).toBe('555555555555');
       expect(result.transaction?.transactionId).toBe('1111111111');
       expect(result.buyer?.userId).toBe('usbuyer789');
     });

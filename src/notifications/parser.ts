@@ -11,7 +11,8 @@ import type {
  * Raw parsed notification structure from eBay.
  */
 interface RawNotification {
-  soapenv?: {
+  // SOAP-wrapped notification (namespace prefix stripped by removeNSPrefix)
+  Envelope?: {
     Body?: {
       GetItemTransactionsResponse?: RawNotificationBody;
       [key: string]: unknown;
@@ -76,9 +77,9 @@ export function parseNotification(xml: string): EbayNotification {
   // Find the notification body (handle both SOAP-wrapped and direct formats)
   let body: RawNotificationBody | undefined;
 
-  if (parsed.soapenv?.Body) {
-    // SOAP-wrapped notification
-    const bodyContent = parsed.soapenv.Body;
+  if (parsed.Envelope?.Body) {
+    // SOAP-wrapped notification (namespace prefix stripped by removeNSPrefix)
+    const bodyContent = parsed.Envelope.Body;
     // Find the response element (e.g., GetItemTransactionsResponse)
     for (const key of Object.keys(bodyContent)) {
       if (key.endsWith('Response') || key.includes('Notification')) {
@@ -120,7 +121,8 @@ export function parseNotification(xml: string): EbayNotification {
  */
 export function extractItem(body: unknown): NotificationItem | undefined {
   const raw = body as RawNotificationBody;
-  const item = raw.Item;
+  // Handle Item being parsed as array (due to isArray config in xml.ts)
+  const item = Array.isArray(raw.Item) ? raw.Item[0] : raw.Item;
 
   if (!item?.ItemID) {
     return undefined;
