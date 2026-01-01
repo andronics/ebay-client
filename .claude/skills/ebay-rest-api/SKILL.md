@@ -16,6 +16,14 @@ Before starting, gather:
 4. **OAuth Scope** required for the API
 5. **Operations to implement** (list of endpoints)
 
+## Feature Branch
+
+Before starting implementation, create a feature branch:
+
+```bash
+git checkout -b feature/{api}-api
+```
+
 ## Implementation Checklist
 
 ### 1. Type Generation Infrastructure
@@ -226,6 +234,40 @@ Update `CLAUDE.md`:
 Update `README.md`:
 - Add {Api} API section with examples
 - Add {Api}Client methods table
+
+## Git Workflow
+
+### Commit Strategy
+
+Make logical commits after completing each phase:
+
+```bash
+# After Phase 2 (Types)
+git add scripts/generate-{api}-types.ts src/types/{api}/ package.json
+git commit -m "feat({api}): add type generation and curated types"
+
+# After Phase 4-5 (Client + Exports)
+git add src/{api}/ src/index.ts src/types/config.ts src/types/index.ts tsup.config.ts
+git commit -m "feat({api}): implement {Api}Client with operations"
+
+# After Phase 6-7 (Tests)
+git add tests/
+git commit -m "test({api}): add unit and integration tests"
+
+# After Phase 8 (Docs)
+git add CLAUDE.md README.md
+git commit -m "docs({api}): update documentation"
+```
+
+### Merge to Main
+
+After all phases complete and tests pass:
+
+```bash
+git checkout main
+git merge --no-ff feature/{api}-api -m "Merge branch 'feature/{api}-api'"
+git branch -d feature/{api}-api
+```
 
 ## Reference Files
 
