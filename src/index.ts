@@ -8,6 +8,7 @@ export { FulfillmentClient } from './fulfillment/index.js';
 export { InventoryClient } from './inventory/index.js';
 export { AccountClient } from './account/index.js';
 export { TaxonomyClient } from './taxonomy/index.js';
+export { ComplianceClient } from './compliance/index.js';
 
 // Notification handling
 export {
@@ -48,6 +49,7 @@ export {
   getInventoryEndpoint,
   getAccountEndpoint,
   getTaxonomyEndpoint,
+  getComplianceEndpoint,
 } from './types/config.js';
 
 // Re-export key types
@@ -60,6 +62,7 @@ export type {
   InventoryClientConfig,
   AccountClientConfig,
   TaxonomyClientConfig,
+  ComplianceClientConfig,
 
   // Trading
   AddItemRequest,
@@ -112,6 +115,15 @@ export type {
   CategorySuggestionResponse,
   Aspect,
   AspectMetadata,
+
+  // Compliance
+  ComplianceType,
+  ComplianceState,
+  ComplianceViolation,
+  ComplianceDetail,
+  ComplianceSummary,
+  ComplianceSummaryInfo,
+  PagedComplianceViolationCollection,
 
   // Notifications
   EbayNotification,

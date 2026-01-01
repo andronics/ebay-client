@@ -8,6 +8,7 @@ export type {
   InventoryClientConfig,
   AccountClientConfig,
   TaxonomyClientConfig,
+  ComplianceClientConfig,
   EbaySiteIdValue,
 } from './config.js';
 
@@ -18,6 +19,7 @@ export {
   getInventoryEndpoint,
   getAccountEndpoint,
   getTaxonomyEndpoint,
+  getComplianceEndpoint,
 } from './config.js';
 
 // Trading types (Generated namespace excluded - import from types/trading directly)
@@ -173,6 +175,23 @@ export type {
   CompatibilityPropertyValue,
   GetCompatibilityPropertyValuesResponse,
 } from './taxonomy/index.js';
+
+// Compliance types (Generated namespace excluded - import from types/compliance directly)
+export type {
+  ComplianceType,
+  ComplianceState,
+  MarketplaceId as ComplianceMarketplaceId,
+  NameValueList as ComplianceNameValueList,
+  VariationDetails,
+  AspectRecommendations,
+  ProductRecommendation,
+  CorrectiveRecommendations,
+  ComplianceDetail,
+  ComplianceViolation,
+  ComplianceSummaryInfo,
+  ComplianceSummary,
+  PagedComplianceViolationCollection,
+} from './compliance/index.js';
 
 // Notification types
 export * from './notifications/index.js';
