@@ -1,0 +1,14 @@
+
+/**
+ * EventProperty
+ * @targetNSAlias `ns`
+ * @targetNamespace `urn:ebay:apis:eBLBaseComponents`
+ */
+export interface EventProperty {
+    /** NotificationEventTypeCodeType|xs:token|OutBid,EndOfAuction,AuctionCheckoutComplete,CheckoutBuyerRequestsTotal,Feedback,FeedbackForSeller,FixedPriceTransaction,SecondChanceOffer,AskSellerQuestion,ItemListed,ItemRevised,BestOffer,MyMessagesAlertHeader,MyMessagesAlert,MyMessageseBayMessageHeader,MyMessageseBayMessage,MyMessagesM2MMessageHeader,MyMessagesM2MMessage,INRBuyerOpenedDispute,INRBuyerRespondedToDispute,INRBuyerClosedDispute,INRSellerRespondedToDispute,Checkout,WatchedItemEndingSoon,ItemClosed,ItemSuspended,ItemSold,ItemExtended,UserIDChanged,ThirdPartyCartCheckout,ItemRevisedAddCharity,ItemAddedToWatchList,ItemRemovedFromWatchList,ItemAddedToBidGroup,ItemRemovedFromBidGroup,FeedbackLeft,FeedbackReceived,FeedbackStarChanged,BidPlaced,BidReceived,ItemWon,ItemLost,ItemUnsold,CounterOfferReceived,BestOfferDeclined,BestOfferPlaced,AddToWatchList,PlaceOffer,RemoveFromWatchList,AddToBidGroup,RemoveFromBidGroup,ItemsCanceled,TokenRevocation,CustomCode,ItemMarkedShipped,ItemMarkedPaid,EBPMyResponseDue,EBPOtherPartyResponseDue,EBPEscalatedCase,EBPAppealedCase,EBPMyPaymentDue,EBPPaymentDone,EBPClosedAppeal,EBPClosedCase,MyMessagesHighPriorityMessage,MyMessagesHighPriorityMessageHeader,EBPOnHoldCase,ReadyToShip,ReadyForPayout,BidItemEndingSoon,ShoppingCartItemEndingSoon,ReturnCreated,ReturnWaitingForSellerInfo,ReturnSellerInfoOverdue,ReturnShipped,ReturnDelivered,ReturnRefundOverdue,ReturnClosed,ReturnEscalated,BuyerCancelRequested,UnmatchedPaymentReceived,RefundSuccess,RefundFailure,OrderInquiryOpened,OrderInquiryReminderForEscalation,OrderInquiryProvideShipmentInformation,OrderInquiryClosed,OrderInquiryEscalatedToCase,ItemReadyForPickup,ItemOutOfStock,PaymentReminder,M2MMessageStatusChange */
+    EventType?: string;
+    /** NotificationEventPropertyNameCodeType|xs:token|TimeLeft,CustomCode */
+    Name?: string;
+    /** xs:string */
+    Value?: string;
+}
