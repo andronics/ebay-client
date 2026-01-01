@@ -13,6 +13,7 @@
    - Fulfillment API (modern REST-based)
    - Inventory API (modern REST-based)
    - Account API (modern REST-based)
+   - Taxonomy API (modern REST-based)
 
 2. **Inbound** - Handle eBay notifications
    - Parse notification XML
@@ -35,6 +36,7 @@
 ├── fulfillment/    → FulfillmentClient (REST)
 ├── inventory/      → InventoryClient (REST)
 ├── account/        → AccountClient (REST)
+├── taxonomy/       → TaxonomyClient (REST)
 ├── notifications/  → Parse, validate, verify inbound events
 ├── auth/           → Auth'n'Auth + OAuth implementations
 ├── types/          → Clean WSDL/OpenAPI-generated types
@@ -60,6 +62,10 @@ Consumer Code
      │        └── errors/
      │
      ├── AccountClient ──────┬── auth/oauth
+     │        │              └── utils/http
+     │        └── errors/
+     │
+     ├── TaxonomyClient ─────┬── auth/oauth
      │        │              └── utils/http
      │        └── errors/
      │
@@ -158,6 +164,30 @@ Headers:
 - CRUD for each policy type (create, get, getAll, update, delete)
 - Get seller privileges (selling limits, registration status)
 
+### Taxonomy API (Modern REST)
+
+REST API for discovering eBay categories and item aspects (attributes):
+
+```
+GET https://api.ebay.com/commerce/taxonomy/v1/get_default_category_tree_id?marketplace_id=EBAY_GB
+Headers:
+  Authorization: Bearer <access-token>
+  Content-Type: application/json
+```
+
+**Key operations:**
+- Get default category tree ID for a marketplace
+- Get full category tree or subtree
+- Get category suggestions based on search query
+- Get item aspects (attributes) for a category
+- Get vehicle parts compatibility properties
+
+**Category discovery workflow:**
+1. Get default category tree ID for marketplace
+2. Search for category suggestions using product keywords
+3. Get item aspects for the selected category
+4. Use aspects to populate ItemSpecifics in listings
+
 ### Notification Flow
 
 eBay sends platform notifications as XML POSTs:
@@ -191,6 +221,7 @@ npm run generate:trading      # Trading API (WSDL)
 npm run generate:fulfillment  # Fulfillment API (OpenAPI)
 npm run generate:inventory    # Inventory API (OpenAPI)
 npm run generate:account      # Account API (OpenAPI)
+npm run generate:taxonomy     # Taxonomy API (OpenAPI)
 npm run generate:all          # All APIs
 ```
 
@@ -223,6 +254,13 @@ npm run generate:all          # All APIs
 2. Add operation method to `src/account/client.ts`
 3. Export from `src/account/index.ts`
 4. Add tests in `tests/unit/account/` and `tests/integration/mock/account.test.ts`
+
+### Adding a New Taxonomy Operation
+
+1. Add request/response types to `src/types/taxonomy/`
+2. Add operation method to `src/taxonomy/client.ts`
+3. Export from `src/taxonomy/index.ts`
+4. Add tests in `tests/unit/taxonomy/` and `tests/integration/mock/taxonomy.test.ts`
 
 ### Adding a New Notification Event Type
 
@@ -269,6 +307,14 @@ npm run generate:account
 - Uses `openapi-typescript` to generate types
 - Output: `src/types/account/generated/`
 
+**Taxonomy API (OpenAPI → TypeScript)**
+```bash
+npm run generate:taxonomy
+```
+- Downloads OpenAPI spec from eBay Developer Portal
+- Uses `openapi-typescript` to generate types
+- Output: `src/types/taxonomy/generated/`
+
 **All APIs at once:**
 ```bash
 npm run generate:all
@@ -280,6 +326,7 @@ import { Generated } from '@andronics/ebay-client/types/trading';
 import { Generated } from '@andronics/ebay-client/types/fulfillment';
 import { Generated } from '@andronics/ebay-client/types/inventory';
 import { Generated } from '@andronics/ebay-client/types/account';
+import { Generated } from '@andronics/ebay-client/types/taxonomy';
 ```
 
 ## Gotchas & Edge Cases
@@ -330,6 +377,9 @@ import { Generated } from '@andronics/ebay-client/types/account';
 │   ├── account/
 │   │   ├── index.ts
 │   │   └── client.ts               # AccountClient class
+│   ├── taxonomy/
+│   │   ├── index.ts
+│   │   └── client.ts               # TaxonomyClient class
 │   ├── notifications/
 │   │   ├── index.ts
 │   │   ├── parser.ts               # Parse notification XML
@@ -347,6 +397,7 @@ import { Generated } from '@andronics/ebay-client/types/account';
 │   │   ├── fulfillment/            # Fulfillment types + generated/
 │   │   ├── inventory/              # Inventory types + generated/
 │   │   ├── account/                # Account types + generated/
+│   │   ├── taxonomy/               # Taxonomy types + generated/
 │   │   └── notifications/          # Notification event types
 │   ├── errors/
 │   │   ├── index.ts
@@ -361,13 +412,15 @@ import { Generated } from '@andronics/ebay-client/types/account';
 │   ├── generate-trading-types.ts   # WSDL type generation
 │   ├── generate-fulfillment-types.ts # OpenAPI type generation
 │   ├── generate-inventory-types.ts # OpenAPI type generation
-│   └── generate-account-types.ts   # OpenAPI type generation
+│   ├── generate-account-types.ts   # OpenAPI type generation
+│   └── generate-taxonomy-types.ts  # OpenAPI type generation
 └── tests/
     ├── unit/
     │   ├── trading/
     │   ├── fulfillment/
     │   ├── inventory/
     │   ├── account/
+    │   ├── taxonomy/
     │   └── notifications/
     └── integration/
         └── mock/
@@ -375,6 +428,7 @@ import { Generated } from '@andronics/ebay-client/types/account';
             ├── trading.test.ts
             ├── inventory.test.ts
             ├── account.test.ts
+            ├── taxonomy.test.ts
             └── notifications.test.ts
 ```
 
