@@ -6,6 +6,7 @@ export type {
   TradingClientConfig,
   FulfillmentClientConfig,
   InventoryClientConfig,
+  AccountClientConfig,
   EbaySiteIdValue,
 } from './config.js';
 
@@ -14,6 +15,7 @@ export {
   getTradingEndpoint,
   getFulfillmentEndpoint,
   getInventoryEndpoint,
+  getAccountEndpoint,
 } from './config.js';
 
 // Trading types (Generated namespace excluded - import from types/trading directly)
@@ -116,6 +118,29 @@ export type {
   PublishOfferResponse,
   OffersResponse,
 } from './inventory/index.js';
+
+// Account types (Generated namespace excluded - import from types/account directly)
+export type {
+  TimeDuration as AccountTimeDuration,
+  TimeDurationUnit,
+  CategoryType as AccountCategoryType,
+  ShippingOption,
+  Amount as AccountAmount,
+  FulfillmentPolicy,
+  FulfillmentPolicyRequest,
+  SetFulfillmentPolicyResponse,
+  FulfillmentPoliciesResponse,
+  PaymentPolicy,
+  PaymentPolicyRequest,
+  SetPaymentPolicyResponse,
+  PaymentPoliciesResponse,
+  ReturnPolicy,
+  ReturnPolicyRequest,
+  SetReturnPolicyResponse,
+  ReturnPoliciesResponse,
+  SellingPrivileges,
+  SellingLimit,
+} from './account/index.js';
 
 // Notification types
 export * from './notifications/index.js';
