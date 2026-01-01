@@ -32,6 +32,7 @@
 
 ```
 @andronics/ebay-client/
+├── base/           → BaseClient, BaseRestClient abstract classes
 ├── trading/        → TradingClient (XML over HTTP)
 ├── fulfillment/    → FulfillmentClient (REST)
 ├── inventory/      → InventoryClient (REST)
@@ -44,30 +45,43 @@
 └── utils/          → XML utilities, HTTP wrapper
 ```
 
+### Client Hierarchy
+
+```
+                    BaseClient (abstract)
+                    ├─ config: { sandbox, retry }
+                    ├─ retryConfig: RetryConfig
+                    ├─ isSandbox(): boolean
+                    └─ abstract getEndpoint(): string
+                           │
+          ┌────────────────┴────────────────┐
+          │                                 │
+    BaseRestClient                    TradingClient
+    ├─ baseUrl: string                (extends BaseClient)
+    ├─ auth: OAuthConfig              ├─ auth: AuthNAuthConfig
+    ├─ request<T>()                   ├─ siteId, compatLevel
+    └─ getBaseUrl(): string           └─ execute<T>()
+          │
+    ┌─────┼─────┬─────────┬───────────┐
+    │     │     │         │           │
+Fulfillment Inventory Account Taxonomy [Future APIs]
+```
+
 ### Module Relationships
 
 ```
 Consumer Code
      │
-     ├── TradingClient ──────┬── auth/auth-n-auth
-     │        │              └── utils/xml
-     │        └── utils/http ────── errors/
+     ├── TradingClient ──────┬── base/BaseClient
+     │        │              ├── auth/auth-n-auth
+     │        └── utils/http ├── utils/xml
+     │                       └── errors/
      │
-     ├── FulfillmentClient ──┬── auth/oauth
-     │        │              └── utils/http
-     │        └── errors/
-     │
-     ├── InventoryClient ────┬── auth/oauth
-     │        │              └── utils/http
-     │        └── errors/
-     │
-     ├── AccountClient ──────┬── auth/oauth
-     │        │              └── utils/http
-     │        └── errors/
-     │
-     ├── TaxonomyClient ─────┬── auth/oauth
-     │        │              └── utils/http
-     │        └── errors/
+     ├── REST Clients ───────┬── base/BaseRestClient
+     │   (Fulfillment,       │   ├── base/BaseClient
+     │    Inventory,         │   ├── auth/oauth
+     │    Account,           │   └── utils/http
+     │    Taxonomy)          └── errors/
      │
      └── notifications/ ─────┬── utils/xml
               │              └── errors/
@@ -363,23 +377,27 @@ import { Generated } from '@andronics/ebay-client/types/taxonomy';
 ├── vitest.config.ts
 ├── src/
 │   ├── index.ts                    # Main exports
+│   ├── base/
+│   │   ├── index.ts
+│   │   ├── base-client.ts          # BaseClient abstract class
+│   │   └── base-rest-client.ts     # BaseRestClient for REST APIs
 │   ├── trading/
 │   │   ├── index.ts
-│   │   ├── client.ts               # TradingClient class
+│   │   ├── client.ts               # TradingClient (extends BaseClient)
 │   │   ├── operations.ts           # Typed operation methods
 │   │   └── xml.ts                  # XML builder/parser
 │   ├── fulfillment/
 │   │   ├── index.ts
-│   │   └── client.ts               # FulfillmentClient class
+│   │   └── client.ts               # FulfillmentClient (extends BaseRestClient)
 │   ├── inventory/
 │   │   ├── index.ts
-│   │   └── client.ts               # InventoryClient class
+│   │   └── client.ts               # InventoryClient (extends BaseRestClient)
 │   ├── account/
 │   │   ├── index.ts
-│   │   └── client.ts               # AccountClient class
+│   │   └── client.ts               # AccountClient (extends BaseRestClient)
 │   ├── taxonomy/
 │   │   ├── index.ts
-│   │   └── client.ts               # TaxonomyClient class
+│   │   └── client.ts               # TaxonomyClient (extends BaseRestClient)
 │   ├── notifications/
 │   │   ├── index.ts
 │   │   ├── parser.ts               # Parse notification XML
@@ -415,6 +433,8 @@ import { Generated } from '@andronics/ebay-client/types/taxonomy';
 │   ├── generate-account-types.ts   # OpenAPI type generation
 │   └── generate-taxonomy-types.ts  # OpenAPI type generation
 └── tests/
+    ├── utils/
+    │   └── test-helpers.ts         # Shared test utilities
     ├── unit/
     │   ├── trading/
     │   ├── fulfillment/
