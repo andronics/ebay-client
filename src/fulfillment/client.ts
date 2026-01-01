@@ -1,8 +1,5 @@
 import type { FulfillmentClientConfig } from '../types/config.js';
-import { getFulfillmentEndpoint } from '../types/config.js';
-import { buildOAuthHeaders, validateOAuthConfig } from '../auth/oauth.js';
-import { httpRequest, type RetryConfig, DEFAULT_RETRY_CONFIG } from '../utils/http.js';
-import { ApiError } from '../errors/api-error.js';
+import { BaseRestClient } from '../base/index.js';
 
 import type {
   Order,
@@ -10,6 +7,11 @@ import type {
   CreateShipmentRequest,
   CreateShipmentResponse,
 } from '../types/fulfillment/index.js';
+
+/**
+ * API path for the Fulfillment API.
+ */
+const API_PATH = '/sell/fulfillment/v1';
 
 /**
  * Parameters for getOrders.
@@ -44,19 +46,6 @@ export interface CreateShipmentParams extends CreateShipmentRequest {
 }
 
 /**
- * Error response from Fulfillment API.
- */
-interface FulfillmentApiError {
-  errors?: Array<{
-    errorId?: number;
-    domain?: string;
-    category?: string;
-    message?: string;
-    longMessage?: string;
-  }>;
-}
-
-/**
  * Client for eBay Fulfillment API (REST-based).
  *
  * @example
@@ -72,54 +61,9 @@ interface FulfillmentApiError {
  * const orders = await client.getOrders({ limit: 50 });
  * ```
  */
-export class FulfillmentClient {
-  private readonly config: FulfillmentClientConfig;
-  private readonly baseUrl: string;
-  private readonly retryConfig: RetryConfig;
-
+export class FulfillmentClient extends BaseRestClient<FulfillmentClientConfig> {
   constructor(config: FulfillmentClientConfig) {
-    validateOAuthConfig(config.auth);
-
-    this.config = config;
-    this.baseUrl = getFulfillmentEndpoint(config.sandbox);
-    this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config.retry };
-  }
-
-  /**
-   * Make a request to the Fulfillment API.
-   */
-  private async request<T>(
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-    path: string,
-    body?: object
-  ): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
-    const headers = buildOAuthHeaders(this.config.auth);
-
-    const response = await httpRequest<T | FulfillmentApiError>(url, {
-      method,
-      headers,
-      body,
-      retry: this.retryConfig,
-    });
-
-    // Check for API errors
-    if (!response.ok) {
-      const errorData = response.data as FulfillmentApiError;
-      const error = errorData.errors?.[0];
-      const message = error?.longMessage ?? error?.message ?? 'Fulfillment API error';
-      throw new ApiError(
-        message,
-        {
-          ErrorCode: String(error?.errorId ?? 'UNKNOWN'),
-          ShortMessage: error?.message,
-          LongMessage: error?.longMessage,
-        },
-        path
-      );
-    }
-
-    return response.data as T;
+    super(config, API_PATH);
   }
 
   // ===========================================================================
@@ -184,7 +128,7 @@ export class FulfillmentClient {
     const { orderId, ...shipmentData } = params;
     const path = `/order/${orderId}/shipping_fulfillment`;
 
-    return this.request<CreateShipmentResponse>('POST', path, shipmentData);
+    return this.request<CreateShipmentResponse>('POST', path, { body: shipmentData });
   }
 
   /**
@@ -206,23 +150,5 @@ export class FulfillmentClient {
   async getShipments(orderId: string): Promise<{ fulfillments?: CreateShipmentResponse[] }> {
     const path = `/order/${orderId}/shipping_fulfillment`;
     return this.request<{ fulfillments?: CreateShipmentResponse[] }>('GET', path);
-  }
-
-  // ===========================================================================
-  // Utility
-  // ===========================================================================
-
-  /**
-   * Get the configured base URL.
-   */
-  getBaseUrl(): string {
-    return this.baseUrl;
-  }
-
-  /**
-   * Check if client is configured for sandbox.
-   */
-  isSandbox(): boolean {
-    return this.config.sandbox;
   }
 }

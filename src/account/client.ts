@@ -1,8 +1,5 @@
 import type { AccountClientConfig } from '../types/config.js';
-import { getAccountEndpoint } from '../types/config.js';
-import { buildOAuthHeaders, validateOAuthConfig } from '../auth/oauth.js';
-import { httpRequest, type RetryConfig, DEFAULT_RETRY_CONFIG } from '../utils/http.js';
-import { ApiError } from '../errors/api-error.js';
+import { BaseRestClient } from '../base/index.js';
 
 import type {
   FulfillmentPolicy,
@@ -20,22 +17,10 @@ import type {
   SellingPrivileges,
 } from '../types/account/index.js';
 
-// ============================================================================
-// Error Response Type
-// ============================================================================
-
 /**
- * Error response from Account API.
+ * API path for the Account API.
  */
-interface AccountApiError {
-  errors?: Array<{
-    errorId?: number;
-    domain?: string;
-    category?: string;
-    message?: string;
-    longMessage?: string;
-  }>;
-}
+const API_PATH = '/sell/account/v1';
 
 // ============================================================================
 // Client Class
@@ -71,54 +56,9 @@ interface AccountApiError {
  * const privileges = await client.getPrivileges();
  * ```
  */
-export class AccountClient {
-  private readonly config: AccountClientConfig;
-  private readonly baseUrl: string;
-  private readonly retryConfig: RetryConfig;
-
+export class AccountClient extends BaseRestClient<AccountClientConfig> {
   constructor(config: AccountClientConfig) {
-    validateOAuthConfig(config.auth);
-
-    this.config = config;
-    this.baseUrl = getAccountEndpoint(config.sandbox);
-    this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config.retry };
-  }
-
-  /**
-   * Make a request to the Account API.
-   */
-  private async request<T>(
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-    path: string,
-    body?: object
-  ): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
-    const headers = buildOAuthHeaders(this.config.auth);
-
-    const response = await httpRequest<T | AccountApiError>(url, {
-      method,
-      headers,
-      body,
-      retry: this.retryConfig,
-    });
-
-    // Check for API errors
-    if (!response.ok) {
-      const errorData = response.data as AccountApiError;
-      const error = errorData.errors?.[0];
-      const message = error?.longMessage ?? error?.message ?? 'Account API error';
-      throw new ApiError(
-        message,
-        {
-          ErrorCode: String(error?.errorId ?? 'UNKNOWN'),
-          ShortMessage: error?.message,
-          LongMessage: error?.longMessage,
-        },
-        path
-      );
-    }
-
-    return response.data as T;
+    super(config, API_PATH);
   }
 
   // ===========================================================================
@@ -133,7 +73,7 @@ export class AccountClient {
   async createFulfillmentPolicy(
     policy: FulfillmentPolicyRequest
   ): Promise<SetFulfillmentPolicyResponse> {
-    return this.request<SetFulfillmentPolicyResponse>('POST', '/fulfillment_policy/', policy);
+    return this.request<SetFulfillmentPolicyResponse>('POST', '/fulfillment_policy/', { body: policy });
   }
 
   /**
@@ -167,7 +107,7 @@ export class AccountClient {
     policy: FulfillmentPolicyRequest
   ): Promise<SetFulfillmentPolicyResponse> {
     const path = `/fulfillment_policy/${encodeURIComponent(policyId)}`;
-    return this.request<SetFulfillmentPolicyResponse>('PUT', path, policy);
+    return this.request<SetFulfillmentPolicyResponse>('PUT', path, { body: policy });
   }
 
   /**
@@ -190,7 +130,7 @@ export class AccountClient {
    * @param policy - The payment policy data
    */
   async createPaymentPolicy(policy: PaymentPolicyRequest): Promise<SetPaymentPolicyResponse> {
-    return this.request<SetPaymentPolicyResponse>('POST', '/payment_policy', policy);
+    return this.request<SetPaymentPolicyResponse>('POST', '/payment_policy', { body: policy });
   }
 
   /**
@@ -224,7 +164,7 @@ export class AccountClient {
     policy: PaymentPolicyRequest
   ): Promise<SetPaymentPolicyResponse> {
     const path = `/payment_policy/${encodeURIComponent(policyId)}`;
-    return this.request<SetPaymentPolicyResponse>('PUT', path, policy);
+    return this.request<SetPaymentPolicyResponse>('PUT', path, { body: policy });
   }
 
   /**
@@ -247,7 +187,7 @@ export class AccountClient {
    * @param policy - The return policy data
    */
   async createReturnPolicy(policy: ReturnPolicyRequest): Promise<SetReturnPolicyResponse> {
-    return this.request<SetReturnPolicyResponse>('POST', '/return_policy/', policy);
+    return this.request<SetReturnPolicyResponse>('POST', '/return_policy/', { body: policy });
   }
 
   /**
@@ -281,7 +221,7 @@ export class AccountClient {
     policy: ReturnPolicyRequest
   ): Promise<SetReturnPolicyResponse> {
     const path = `/return_policy/${encodeURIComponent(policyId)}`;
-    return this.request<SetReturnPolicyResponse>('PUT', path, policy);
+    return this.request<SetReturnPolicyResponse>('PUT', path, { body: policy });
   }
 
   /**
@@ -303,23 +243,5 @@ export class AccountClient {
    */
   async getPrivileges(): Promise<SellingPrivileges> {
     return this.request<SellingPrivileges>('GET', '/privilege');
-  }
-
-  // ===========================================================================
-  // Utility
-  // ===========================================================================
-
-  /**
-   * Get the configured base URL.
-   */
-  getBaseUrl(): string {
-    return this.baseUrl;
-  }
-
-  /**
-   * Check if client is configured for sandbox.
-   */
-  isSandbox(): boolean {
-    return this.config.sandbox;
   }
 }

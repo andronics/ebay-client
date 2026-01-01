@@ -1,8 +1,5 @@
 import type { InventoryClientConfig } from '../types/config.js';
-import { getInventoryEndpoint } from '../types/config.js';
-import { buildOAuthHeaders, validateOAuthConfig } from '../auth/oauth.js';
-import { httpRequest, type RetryConfig, DEFAULT_RETRY_CONFIG } from '../utils/http.js';
-import { ApiError } from '../errors/api-error.js';
+import { BaseRestClient } from '../base/index.js';
 
 import type {
   InventoryItem,
@@ -46,22 +43,10 @@ export interface GetOffersParams {
   offset?: number;
 }
 
-// ============================================================================
-// Error Response Type
-// ============================================================================
-
 /**
- * Error response from Inventory API.
+ * API path for the Inventory API.
  */
-interface InventoryApiError {
-  errors?: Array<{
-    errorId?: number;
-    domain?: string;
-    category?: string;
-    message?: string;
-    longMessage?: string;
-  }>;
-}
+const API_PATH = '/sell/inventory/v1';
 
 // ============================================================================
 // Client Class
@@ -100,54 +85,9 @@ interface InventoryApiError {
  * await client.publishOffer(offerId);
  * ```
  */
-export class InventoryClient {
-  private readonly config: InventoryClientConfig;
-  private readonly baseUrl: string;
-  private readonly retryConfig: RetryConfig;
-
+export class InventoryClient extends BaseRestClient<InventoryClientConfig> {
   constructor(config: InventoryClientConfig) {
-    validateOAuthConfig(config.auth);
-
-    this.config = config;
-    this.baseUrl = getInventoryEndpoint(config.sandbox);
-    this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config.retry };
-  }
-
-  /**
-   * Make a request to the Inventory API.
-   */
-  private async request<T>(
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-    path: string,
-    body?: object
-  ): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
-    const headers = buildOAuthHeaders(this.config.auth);
-
-    const response = await httpRequest<T | InventoryApiError>(url, {
-      method,
-      headers,
-      body,
-      retry: this.retryConfig,
-    });
-
-    // Check for API errors
-    if (!response.ok) {
-      const errorData = response.data as InventoryApiError;
-      const error = errorData.errors?.[0];
-      const message = error?.longMessage ?? error?.message ?? 'Inventory API error';
-      throw new ApiError(
-        message,
-        {
-          ErrorCode: String(error?.errorId ?? 'UNKNOWN'),
-          ShortMessage: error?.message,
-          LongMessage: error?.longMessage,
-        },
-        path
-      );
-    }
-
-    return response.data as T;
+    super(config, API_PATH);
   }
 
   // ===========================================================================
@@ -165,7 +105,7 @@ export class InventoryClient {
     item: CreateOrReplaceInventoryItemRequest
   ): Promise<void> {
     const path = `/inventory_item/${encodeURIComponent(sku)}`;
-    await this.request<void>('PUT', path, item);
+    await this.request<void>('PUT', path, { body: item });
   }
 
   /**
@@ -219,7 +159,7 @@ export class InventoryClient {
    * @param offer - The offer data
    */
   async createOffer(offer: CreateOfferRequest): Promise<CreateOfferResponse> {
-    return this.request<CreateOfferResponse>('POST', '/offer', offer);
+    return this.request<CreateOfferResponse>('POST', '/offer', { body: offer });
   }
 
   /**
@@ -240,7 +180,7 @@ export class InventoryClient {
    */
   async updateOffer(offerId: string, offer: UpdateOfferRequest): Promise<void> {
     const path = `/offer/${encodeURIComponent(offerId)}`;
-    await this.request<void>('PUT', path, offer);
+    await this.request<void>('PUT', path, { body: offer });
   }
 
   /**
@@ -281,23 +221,5 @@ export class InventoryClient {
     const path = `/offer${queryString ? `?${queryString}` : ''}`;
 
     return this.request<OffersResponse>('GET', path);
-  }
-
-  // ===========================================================================
-  // Utility
-  // ===========================================================================
-
-  /**
-   * Get the configured base URL.
-   */
-  getBaseUrl(): string {
-    return this.baseUrl;
-  }
-
-  /**
-   * Check if client is configured for sandbox.
-   */
-  isSandbox(): boolean {
-    return this.config.sandbox;
   }
 }

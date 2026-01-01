@@ -1,8 +1,5 @@
 import type { TaxonomyClientConfig } from '../types/config.js';
-import { getTaxonomyEndpoint } from '../types/config.js';
-import { buildOAuthHeaders, validateOAuthConfig } from '../auth/oauth.js';
-import { httpRequest, type RetryConfig, DEFAULT_RETRY_CONFIG } from '../utils/http.js';
-import { ApiError } from '../errors/api-error.js';
+import { BaseRestClient } from '../base/index.js';
 
 import type {
   MarketplaceId,
@@ -75,22 +72,10 @@ export interface GetCompatibilityPropertyValuesParams {
   filter?: string;
 }
 
-// ============================================================================
-// Error Response Type
-// ============================================================================
-
 /**
- * Error response from Taxonomy API.
+ * API path for the Taxonomy API.
  */
-interface TaxonomyApiError {
-  errors?: Array<{
-    errorId?: number;
-    domain?: string;
-    category?: string;
-    message?: string;
-    longMessage?: string;
-  }>;
-}
+const API_PATH = '/commerce/taxonomy/v1';
 
 // ============================================================================
 // Client Class
@@ -129,53 +114,9 @@ interface TaxonomyApiError {
  * });
  * ```
  */
-export class TaxonomyClient {
-  private readonly config: TaxonomyClientConfig;
-  private readonly baseUrl: string;
-  private readonly retryConfig: RetryConfig;
-
+export class TaxonomyClient extends BaseRestClient<TaxonomyClientConfig> {
   constructor(config: TaxonomyClientConfig) {
-    validateOAuthConfig(config.auth);
-
-    this.config = config;
-    this.baseUrl = getTaxonomyEndpoint(config.sandbox);
-    this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config.retry };
-  }
-
-  /**
-   * Make a request to the Taxonomy API.
-   */
-  private async request<T>(
-    method: 'GET',
-    path: string,
-    headers?: Record<string, string>
-  ): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
-    const authHeaders = buildOAuthHeaders(this.config.auth);
-
-    const response = await httpRequest<T | TaxonomyApiError>(url, {
-      method,
-      headers: { ...authHeaders, ...headers },
-      retry: this.retryConfig,
-    });
-
-    // Check for API errors
-    if (!response.ok) {
-      const errorData = response.data as TaxonomyApiError;
-      const error = errorData.errors?.[0];
-      const message = error?.longMessage ?? error?.message ?? 'Taxonomy API error';
-      throw new ApiError(
-        message,
-        {
-          ErrorCode: String(error?.errorId ?? 'UNKNOWN'),
-          ShortMessage: error?.message,
-          LongMessage: error?.longMessage,
-        },
-        path
-      );
-    }
-
-    return response.data as T;
+    super(config, API_PATH);
   }
 
   // ===========================================================================
@@ -203,7 +144,7 @@ export class TaxonomyClient {
   async getCategoryTree(categoryTreeId: string): Promise<CategoryTree> {
     const path = `/category_tree/${encodeURIComponent(categoryTreeId)}`;
     return this.request<CategoryTree>('GET', path, {
-      'Accept-Encoding': 'gzip',
+      headers: { 'Accept-Encoding': 'gzip' },
     });
   }
 
@@ -218,7 +159,7 @@ export class TaxonomyClient {
     });
     const path = `/category_tree/${encodeURIComponent(params.categoryTreeId)}/get_category_subtree?${queryParams}`;
     return this.request<CategorySubtree>('GET', path, {
-      'Accept-Encoding': 'gzip',
+      headers: { 'Accept-Encoding': 'gzip' },
     });
   }
 
@@ -339,23 +280,5 @@ export class TaxonomyClient {
     }
     const path = `/category_tree/${encodeURIComponent(params.categoryTreeId)}/get_compatibility_property_values?${queryParams}`;
     return this.request<GetCompatibilityPropertyValuesResponse>('GET', path);
-  }
-
-  // ===========================================================================
-  // Utility
-  // ===========================================================================
-
-  /**
-   * Get the configured base URL.
-   */
-  getBaseUrl(): string {
-    return this.baseUrl;
-  }
-
-  /**
-   * Check if client is configured for sandbox.
-   */
-  isSandbox(): boolean {
-    return this.config.sandbox;
   }
 }
