@@ -80,6 +80,18 @@ export interface FulfillmentClientConfig {
 }
 
 /**
+ * Inventory API client configuration.
+ */
+export interface InventoryClientConfig {
+  /** Use sandbox (true) or production (false) environment */
+  sandbox: boolean;
+  /** Authentication configuration */
+  auth: OAuthConfig;
+  /** Retry configuration */
+  retry?: Partial<RetryConfig>;
+}
+
+/**
  * Get the eBay Trading API endpoint URL.
  */
 export function getTradingEndpoint(sandbox: boolean): string {
@@ -95,4 +107,13 @@ export function getFulfillmentEndpoint(sandbox: boolean): string {
   return sandbox
     ? 'https://api.sandbox.ebay.com/sell/fulfillment/v1'
     : 'https://api.ebay.com/sell/fulfillment/v1';
+}
+
+/**
+ * Get the eBay Inventory API base URL.
+ */
+export function getInventoryEndpoint(sandbox: boolean): string {
+  return sandbox
+    ? 'https://api.sandbox.ebay.com/sell/inventory/v1'
+    : 'https://api.ebay.com/sell/inventory/v1';
 }
