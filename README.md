@@ -3,7 +3,7 @@
 [![CI](https://github.com/andronics/ebay-client/actions/workflows/ci.yml/badge.svg)](https://github.com/andronics/ebay-client/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/@andronics/ebay-client.svg)](https://www.npmjs.com/package/@andronics/ebay-client)
 
-A pure TypeScript library for eBay API integration. Supports Trading API (XML), Fulfillment API (REST), and Inventory API (REST), plus inbound notification handling.
+A pure TypeScript library for eBay API integration. Supports Trading API (XML), Fulfillment API (REST), Inventory API (REST), and Account API (REST), plus inbound notification handling.
 
 **This is a library, not a server.** Use it in your serverless functions, Express apps, or any Node.js environment.
 
@@ -150,6 +150,75 @@ await inventory.updateOffer(offerId, {
 await inventory.deleteInventoryItem('MY-SKU-001');
 ```
 
+### Account API (Business Policies via REST)
+
+```typescript
+import { AccountClient } from '@andronics/ebay-client/account';
+
+const account = new AccountClient({
+  sandbox: false,
+  auth: {
+    accessToken: 'your-access-token',
+  },
+});
+
+// Get seller privileges
+const privileges = await account.getPrivileges();
+console.log('Selling limit:', privileges.sellingLimit?.quantity);
+
+// Create a fulfillment (shipping) policy
+const { fulfillmentPolicyId } = await account.createFulfillmentPolicy({
+  name: 'Standard UK Shipping',
+  marketplaceId: 'EBAY_GB',
+  handlingTime: { unit: 'DAY', value: 1 },
+  shippingOptions: [
+    {
+      optionType: 'DOMESTIC',
+      costType: 'FLAT_RATE',
+      shippingServices: [
+        {
+          shippingCarrierCode: 'Royal Mail',
+          shippingServiceCode: 'UK_RoyalMailFirstClassStandard',
+          shippingCost: { value: '3.99', currency: 'GBP' },
+        },
+      ],
+    },
+  ],
+});
+
+// Create a payment policy
+const { paymentPolicyId } = await account.createPaymentPolicy({
+  name: 'Immediate Payment Required',
+  marketplaceId: 'EBAY_GB',
+  immediatePay: true,
+});
+
+// Create a return policy
+const { returnPolicyId } = await account.createReturnPolicy({
+  name: '30 Day Returns',
+  marketplaceId: 'EBAY_GB',
+  returnsAccepted: true,
+  returnPeriod: { unit: 'DAY', value: 30 },
+  returnShippingCostPayer: 'BUYER',
+  refundMethod: 'MONEY_BACK',
+});
+
+// Get all policies for a marketplace
+const fulfillmentPolicies = await account.getFulfillmentPolicies('EBAY_GB');
+const paymentPolicies = await account.getPaymentPolicies('EBAY_GB');
+const returnPolicies = await account.getReturnPolicies('EBAY_GB');
+
+// Update a policy
+await account.updateFulfillmentPolicy(fulfillmentPolicyId, {
+  name: 'Express UK Shipping',
+  marketplaceId: 'EBAY_GB',
+  handlingTime: { unit: 'DAY', value: 0 },
+});
+
+// Delete a policy
+await account.deleteFulfillmentPolicy(fulfillmentPolicyId);
+```
+
 ### Handling Notifications
 
 ```typescript
@@ -254,6 +323,19 @@ interface InventoryClientConfig {
 }
 ```
 
+### Account Client Config
+
+```typescript
+interface AccountClientConfig {
+  sandbox: boolean;
+  auth: OAuthConfig;
+  retry?: {
+    maxRetries: number;
+    delayMs: number;
+  };
+}
+```
+
 ## Type Imports
 
 The library exports clean, typed interfaces generated from eBay's specs:
@@ -274,6 +356,14 @@ import type {
   CreateOfferResponse,
 } from '@andronics/ebay-client/types/inventory';
 
+// Import account types
+import type {
+  FulfillmentPolicy,
+  PaymentPolicy,
+  ReturnPolicy,
+  SellingPrivileges,
+} from '@andronics/ebay-client/types/account';
+
 // Import notification types
 import type {
   EbayNotification,
@@ -284,6 +374,7 @@ import type {
 // Import all types from a namespace
 import type * as Trading from '@andronics/ebay-client/types/trading';
 import type * as Inventory from '@andronics/ebay-client/types/inventory';
+import type * as Account from '@andronics/ebay-client/types/account';
 ```
 
 ## Error Handling
@@ -350,6 +441,27 @@ try {
 | `updateOffer(offerId, offer)` | Update an existing offer |
 | `publishOffer(offerId)` | Publish offer to make listing live |
 | `getOffers(params)` | List offers for a SKU |
+
+### AccountClient Methods
+
+| Method | Description |
+|--------|-------------|
+| `createFulfillmentPolicy(policy)` | Create a fulfillment (shipping) policy |
+| `getFulfillmentPolicy(policyId)` | Get fulfillment policy by ID |
+| `getFulfillmentPolicies(marketplaceId)` | List all fulfillment policies |
+| `updateFulfillmentPolicy(policyId, policy)` | Update a fulfillment policy |
+| `deleteFulfillmentPolicy(policyId)` | Delete a fulfillment policy |
+| `createPaymentPolicy(policy)` | Create a payment policy |
+| `getPaymentPolicy(policyId)` | Get payment policy by ID |
+| `getPaymentPolicies(marketplaceId)` | List all payment policies |
+| `updatePaymentPolicy(policyId, policy)` | Update a payment policy |
+| `deletePaymentPolicy(policyId)` | Delete a payment policy |
+| `createReturnPolicy(policy)` | Create a return policy |
+| `getReturnPolicy(policyId)` | Get return policy by ID |
+| `getReturnPolicies(marketplaceId)` | List all return policies |
+| `updateReturnPolicy(policyId, policy)` | Update a return policy |
+| `deleteReturnPolicy(policyId)` | Delete a return policy |
+| `getPrivileges()` | Get seller privileges and selling limits |
 
 ### Notification Functions
 

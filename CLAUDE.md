@@ -12,6 +12,7 @@
    - Trading API (legacy XML-based)
    - Fulfillment API (modern REST-based)
    - Inventory API (modern REST-based)
+   - Account API (modern REST-based)
 
 2. **Inbound** - Handle eBay notifications
    - Parse notification XML
@@ -33,6 +34,7 @@
 ├── trading/        → TradingClient (XML over HTTP)
 ├── fulfillment/    → FulfillmentClient (REST)
 ├── inventory/      → InventoryClient (REST)
+├── account/        → AccountClient (REST)
 ├── notifications/  → Parse, validate, verify inbound events
 ├── auth/           → Auth'n'Auth + OAuth implementations
 ├── types/          → Clean WSDL/OpenAPI-generated types
@@ -54,6 +56,10 @@ Consumer Code
      │        └── errors/
      │
      ├── InventoryClient ────┬── auth/oauth
+     │        │              └── utils/http
+     │        └── errors/
+     │
+     ├── AccountClient ──────┬── auth/oauth
      │        │              └── utils/http
      │        └── errors/
      │
@@ -132,6 +138,26 @@ Body:
 2. Create offer (pricing, policies, marketplace)
 3. Publish offer (makes listing live on eBay)
 
+### Account API (Modern REST)
+
+REST API for managing seller business policies and checking account privileges:
+
+```
+GET https://api.ebay.com/sell/account/v1/fulfillment_policy?marketplace_id=EBAY_GB
+Headers:
+  Authorization: Bearer <access-token>
+  Content-Type: application/json
+```
+
+**Policy types:**
+- Fulfillment Policy - shipping options, handling time, shipping services
+- Payment Policy - payment methods, immediate payment settings
+- Return Policy - return period, refund method, return shipping cost payer
+
+**Operations:**
+- CRUD for each policy type (create, get, getAll, update, delete)
+- Get seller privileges (selling limits, registration status)
+
 ### Notification Flow
 
 eBay sends platform notifications as XML POSTs:
@@ -164,6 +190,7 @@ npm run dev
 npm run generate:trading      # Trading API (WSDL)
 npm run generate:fulfillment  # Fulfillment API (OpenAPI)
 npm run generate:inventory    # Inventory API (OpenAPI)
+npm run generate:account      # Account API (OpenAPI)
 npm run generate:all          # All APIs
 ```
 
@@ -189,6 +216,13 @@ npm run generate:all          # All APIs
 2. Add operation method to `src/inventory/client.ts`
 3. Export from `src/inventory/index.ts`
 4. Add tests in `tests/unit/inventory/` and `tests/integration/mock/inventory.test.ts`
+
+### Adding a New Account Operation
+
+1. Add request/response types to `src/types/account/`
+2. Add operation method to `src/account/client.ts`
+3. Export from `src/account/index.ts`
+4. Add tests in `tests/unit/account/` and `tests/integration/mock/account.test.ts`
 
 ### Adding a New Notification Event Type
 
@@ -227,6 +261,14 @@ npm run generate:inventory
 - Uses `openapi-typescript` to generate types
 - Output: `src/types/inventory/generated/`
 
+**Account API (OpenAPI → TypeScript)**
+```bash
+npm run generate:account
+```
+- Downloads OpenAPI spec from eBay Developer Portal
+- Uses `openapi-typescript` to generate types
+- Output: `src/types/account/generated/`
+
 **All APIs at once:**
 ```bash
 npm run generate:all
@@ -237,6 +279,7 @@ Access generated types via the `Generated` namespace:
 import { Generated } from '@andronics/ebay-client/types/trading';
 import { Generated } from '@andronics/ebay-client/types/fulfillment';
 import { Generated } from '@andronics/ebay-client/types/inventory';
+import { Generated } from '@andronics/ebay-client/types/account';
 ```
 
 ## Gotchas & Edge Cases
@@ -284,6 +327,9 @@ import { Generated } from '@andronics/ebay-client/types/inventory';
 │   ├── inventory/
 │   │   ├── index.ts
 │   │   └── client.ts               # InventoryClient class
+│   ├── account/
+│   │   ├── index.ts
+│   │   └── client.ts               # AccountClient class
 │   ├── notifications/
 │   │   ├── index.ts
 │   │   ├── parser.ts               # Parse notification XML
@@ -300,6 +346,7 @@ import { Generated } from '@andronics/ebay-client/types/inventory';
 │   │   ├── trading/                # Trading types + generated/
 │   │   ├── fulfillment/            # Fulfillment types + generated/
 │   │   ├── inventory/              # Inventory types + generated/
+│   │   ├── account/                # Account types + generated/
 │   │   └── notifications/          # Notification event types
 │   ├── errors/
 │   │   ├── index.ts
@@ -313,18 +360,21 @@ import { Generated } from '@andronics/ebay-client/types/inventory';
 ├── scripts/
 │   ├── generate-trading-types.ts   # WSDL type generation
 │   ├── generate-fulfillment-types.ts # OpenAPI type generation
-│   └── generate-inventory-types.ts # OpenAPI type generation
+│   ├── generate-inventory-types.ts # OpenAPI type generation
+│   └── generate-account-types.ts   # OpenAPI type generation
 └── tests/
     ├── unit/
     │   ├── trading/
     │   ├── fulfillment/
     │   ├── inventory/
+    │   ├── account/
     │   └── notifications/
     └── integration/
         └── mock/
             ├── handlers/           # MSW request handlers
             ├── trading.test.ts
             ├── inventory.test.ts
+            ├── account.test.ts
             └── notifications.test.ts
 ```
 
