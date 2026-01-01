@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/andronics/ebay-client/compare/v1.0.0...v1.0.1) (2026-01-01)
+
+
+### Bug Fixes
+
+* **ci:** enable npm provenance for package attestation ([6111f17](https://github.com/andronics/ebay-client/commit/6111f17481037cf258aa8119ad0c601dee2bb1e9))
+
 # 1.0.0 (2026-01-01)
 
 
