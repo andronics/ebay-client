@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
-import { AccountClient } from '../../../src/account/client.js';
+import { AccountClient } from '../../../src/clients/account.js';
 import { ApiError } from '../../../src/errors/api-error.js';
 import type { AccountClientConfig } from '../../../src/types/config.js';
 import { server } from './setup.js';

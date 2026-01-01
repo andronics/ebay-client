@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
-import { ComplianceClient } from '../../../src/compliance/client.js';
+import { ComplianceClient } from '../../../src/clients/compliance.js';
 import { ApiError } from '../../../src/errors/api-error.js';
 import type { ComplianceClientConfig } from '../../../src/types/config.js';
 import { server } from './setup.js';

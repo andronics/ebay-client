@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
-import { TaxonomyClient } from '../../../src/taxonomy/client.js';
+import { TaxonomyClient } from '../../../src/clients/taxonomy.js';
 import { ApiError } from '../../../src/errors/api-error.js';
 import type { TaxonomyClientConfig } from '../../../src/types/config.js';
 import { server } from './setup.js';

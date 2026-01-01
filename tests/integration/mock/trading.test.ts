@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
-import { TradingClient } from '../../../src/trading/client.js';
+import { TradingClient } from '../../../src/clients/trading.js';
 import { ApiError } from '../../../src/errors/api-error.js';
 import type { TradingClientConfig } from '../../../src/types/config.js';
 import { server } from './setup.js';

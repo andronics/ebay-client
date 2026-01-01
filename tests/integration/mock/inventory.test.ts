@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
-import { InventoryClient } from '../../../src/inventory/client.js';
+import { InventoryClient } from '../../../src/clients/inventory.js';
 import { ApiError } from '../../../src/errors/api-error.js';
 import type { InventoryClientConfig } from '../../../src/types/config.js';
 import { server } from './setup.js';

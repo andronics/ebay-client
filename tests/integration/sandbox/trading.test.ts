@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { TradingClient } from '../../../src/trading/client.js';
+import { TradingClient } from '../../../src/clients/trading.js';
 import { describeIfSandbox, sandboxConfig, logSandboxStatus } from './setup.js';
 
 // Log sandbox status at module load
