@@ -5,7 +5,7 @@ description: Implement a new eBay REST API client following established patterns
 
 # Implement New eBay REST API
 
-This skill guides the implementation of new eBay REST API clients following the established `FulfillmentClient` pattern.
+This skill guides the implementation of new eBay REST API clients by extending `BaseRestClient`. All REST clients inherit common functionality (OAuth, request handling, error handling) from the base class.
 
 ## Prerequisites
 
@@ -89,14 +89,15 @@ export function get{Api}Endpoint(sandbox: boolean): string {
 
 ### 4. Client Implementation
 
-Create `src/{api}/client.ts` following this structure:
+Create `src/{api}/client.ts` extending `BaseRestClient`:
 
 ```typescript
 import type { {Api}ClientConfig } from '../types/config.js';
-import { get{Api}Endpoint } from '../types/config.js';
-import { buildOAuthHeaders, validateOAuthConfig } from '../auth/oauth.js';
-import { httpRequest, type RetryConfig, DEFAULT_RETRY_CONFIG } from '../utils/http.js';
-import { ApiError } from '../errors/api-error.js';
+import { BaseRestClient } from '../base/index.js';
+
+import type {
+  // Import domain types from ../types/{api}/index.js
+} from '../types/{api}/index.js';
 
 // Parameter types for operations
 export interface Get{Resources}Params {
@@ -105,72 +106,62 @@ export interface Get{Resources}Params {
   // ... query params
 }
 
-// API Error response type
-interface {Api}ApiError {
-  errors?: Array<{
-    errorId?: number;
-    domain?: string;
-    category?: string;
-    message?: string;
-    longMessage?: string;
-  }>;
-}
+/**
+ * API path for the {Api} API.
+ */
+const API_PATH = '/sell/{api}/v1';
 
-export class {Api}Client {
-  private readonly config: {Api}ClientConfig;
-  private readonly baseUrl: string;
-  private readonly retryConfig: RetryConfig;
-
+/**
+ * Client for eBay {Api} API (REST-based).
+ */
+export class {Api}Client extends BaseRestClient<{Api}ClientConfig> {
   constructor(config: {Api}ClientConfig) {
-    validateOAuthConfig(config.auth);
-    this.config = config;
-    this.baseUrl = get{Api}Endpoint(config.sandbox);
-    this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...config.retry };
+    super(config, API_PATH);
   }
 
-  private async request<T>(
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-    path: string,
-    body?: object
-  ): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
-    const headers = buildOAuthHeaders(this.config.auth);
+  // Operations use inherited request() method from BaseRestClient:
+  //
+  // GET single:
+  //   async get{Resource}(id: string): Promise<{Resource}> {
+  //     return this.request<{Resource}>('GET', `/{resource}/${id}`);
+  //   }
+  //
+  // GET list:
+  //   async get{Resources}(params?: Get{Resources}Params): Promise<{Resources}Response> {
+  //     const query = buildQueryString(params);
+  //     return this.request<{Resources}Response>('GET', `/{resources}${query}`);
+  //   }
+  //
+  // POST (note the { body } wrapper):
+  //   async create{Resource}(data: Create{Resource}Request): Promise<Create{Resource}Response> {
+  //     return this.request<Create{Resource}Response>('POST', '/{resource}', { body: data });
+  //   }
+  //
+  // PUT (note the { body } wrapper):
+  //   async update{Resource}(id: string, data: Update{Resource}Request): Promise<void> {
+  //     await this.request<void>('PUT', `/{resource}/${id}`, { body: data });
+  //   }
+  //
+  // DELETE:
+  //   async delete{Resource}(id: string): Promise<void> {
+  //     await this.request<void>('DELETE', `/{resource}/${id}`);
+  //   }
+  //
+  // With custom headers (e.g., Accept-Encoding):
+  //   return this.request<T>('GET', path, { headers: { 'Accept-Encoding': 'gzip' } });
 
-    const response = await httpRequest<T | {Api}ApiError>(url, {
-      method,
-      headers,
-      body,
-      retry: this.retryConfig,
-    });
-
-    if (!response.ok) {
-      const errorData = response.data as {Api}ApiError;
-      const error = errorData.errors?.[0];
-      throw new ApiError(
-        error?.longMessage ?? error?.message ?? '{Api} API error',
-        {
-          ErrorCode: String(error?.errorId ?? 'UNKNOWN'),
-          ShortMessage: error?.message,
-          LongMessage: error?.longMessage,
-        },
-        path
-      );
-    }
-
-    return response.data as T;
-  }
-
-  // Operations follow patterns:
-  // GET single: async get{Resource}(id: string): Promise<{Resource}>
-  // GET list: async get{Resources}(params?: Get{Resources}Params): Promise<{Resources}Response>
-  // POST: async create{Resource}(data: Create{Resource}Request): Promise<Create{Resource}Response>
-  // PUT: async update{Resource}(id: string, data: Update{Resource}Request): Promise<void>
-  // DELETE: async delete{Resource}(id: string): Promise<void>
-
-  getBaseUrl(): string { return this.baseUrl; }
-  isSandbox(): boolean { return this.config.sandbox; }
+  // Inherited from BaseRestClient:
+  // - getBaseUrl(): string
+  // - getEndpoint(): string
+  // - isSandbox(): boolean
 }
 ```
+
+**Note:** The `BaseRestClient` provides:
+- OAuth authentication (validates config, builds headers)
+- JSON request/response handling with retry logic
+- Standard eBay REST API error handling
+- `getBaseUrl()`, `getEndpoint()`, and `isSandbox()` utility methods
 
 Create `src/{api}/index.ts`:
 ```typescript
@@ -272,11 +263,13 @@ git branch -d feature/{api}-api
 ## Reference Files
 
 These existing files are the patterns to follow:
-- `src/fulfillment/client.ts` - Client structure
+- `src/base/base-rest-client.ts` - Base class with request handling and error handling
+- `src/fulfillment/client.ts` - Example REST client extending BaseRestClient
 - `src/types/fulfillment/` - Type organization
 - `scripts/generate-fulfillment-types.ts` - Type generation
 - `tests/unit/fulfillment/client.test.ts` - Unit test patterns
 - `tests/integration/mock/handlers/` - MSW handler patterns
+- `tests/utils/test-helpers.ts` - Shared test utilities
 
 ## eBay REST API Specs
 
