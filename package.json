@@ -1,6 +1,6 @@
 {
   "name": "@andronics/ebay-client",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Pure library for eBay API integration - Trading (XML) and Fulfillment (REST) APIs with notification handling",
   "type": "module",
   "main": "./dist/index.js",

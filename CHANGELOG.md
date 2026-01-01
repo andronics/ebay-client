@@ -1,3 +1,17 @@
+# [1.1.0](https://github.com/andronics/ebay-client/compare/v1.0.0...v1.1.0) (2026-01-01)
+
+
+### Features
+
+* **account:** add type generation and curated types ([640811c](https://github.com/andronics/ebay-client/commit/640811ce82080fd789993e23501b74f3186f1645))
+* **account:** implement AccountClient with policy and privilege operations ([c4e9880](https://github.com/andronics/ebay-client/commit/c4e9880c1bc0e5b80b9130a88da32f0cdcf075a6))
+* add Claude skill for implementing new eBay REST APIs ([0608c7a](https://github.com/andronics/ebay-client/commit/0608c7acea9361782ca0ca54850757960a0b363d))
+* **inventory:** add Inventory API client with CRUD and offer operations ([d807b7f](https://github.com/andronics/ebay-client/commit/d807b7ff0bb168e5c0efa17d454a5a1ccf553fd2))
+* **inventory:** add type generation and curated types ([870155a](https://github.com/andronics/ebay-client/commit/870155a3796cf31c962d1c452a19555566a5785d))
+* **inventory:** implement InventoryClient with CRUD and offer operations ([c6f4d5d](https://github.com/andronics/ebay-client/commit/c6f4d5de7d6d1de340b82a5b4a0dac166f54b11d))
+* **taxonomy:** add type generation and curated types ([e48aa8c](https://github.com/andronics/ebay-client/commit/e48aa8cc62d5a86cc85f2fbed4cd36bed2218986))
+* **taxonomy:** implement TaxonomyClient with operations ([ea801a5](https://github.com/andronics/ebay-client/commit/ea801a577ed1b1e0f875aff93a205417baa219dc))
+
 # 1.0.0 (2026-01-01)
 
 
