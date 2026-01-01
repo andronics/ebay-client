@@ -3,6 +3,7 @@ import { tradingHandlers } from './handlers/trading.js';
 import { inventoryHandlers } from './handlers/inventory.js';
 import { accountHandlers } from './handlers/account.js';
 import { taxonomyHandlers } from './handlers/taxonomy.js';
+import { complianceHandlers } from './handlers/compliance.js';
 
 /**
  * MSW server for mocking HTTP requests in integration tests.
@@ -11,7 +12,8 @@ export const server = setupServer(
   ...tradingHandlers,
   ...inventoryHandlers,
   ...accountHandlers,
-  ...taxonomyHandlers
+  ...taxonomyHandlers,
+  ...complianceHandlers
 );
 
 /**
