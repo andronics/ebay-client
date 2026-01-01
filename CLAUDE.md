@@ -34,12 +34,13 @@
 ```
 @andronics/ebay-client/
 ├── base/           → BaseClient, BaseRestClient abstract classes
-├── trading/        → TradingClient (XML over HTTP)
-├── fulfillment/    → FulfillmentClient (REST)
-├── inventory/      → InventoryClient (REST)
-├── account/        → AccountClient (REST)
-├── taxonomy/       → TaxonomyClient (REST)
-├── compliance/     → ComplianceClient (REST)
+├── clients/        → All API clients in single files
+│   ├── trading.ts      → TradingClient (XML over HTTP)
+│   ├── fulfillment.ts  → FulfillmentClient (REST)
+│   ├── inventory.ts    → InventoryClient (REST)
+│   ├── account.ts      → AccountClient (REST)
+│   ├── taxonomy.ts     → TaxonomyClient (REST)
+│   └── compliance.ts   → ComplianceClient (REST)
 ├── notifications/  → Parse, validate, verify inbound events
 ├── auth/           → Auth'n'Auth + OAuth implementations
 ├── types/          → Clean WSDL/OpenAPI-generated types
@@ -276,44 +277,44 @@ npm run generate:all          # All APIs
 ### Adding a New Trading Operation
 
 1. Add request/response types to `src/types/trading/`
-2. Add operation method to `src/trading/operations.ts`
-3. Export from `src/trading/index.ts`
-4. Add tests in `tests/trading/`
+2. Add operation method to `src/clients/trading.ts`
+3. Export from `src/clients/index.ts` (if new types needed)
+4. Add tests in `tests/unit/clients/trading.test.ts`
 
 ### Adding a New Fulfillment Operation
 
 1. Add request/response types to `src/types/fulfillment/`
-2. Add operation method to `src/fulfillment/operations.ts`
-3. Export from `src/fulfillment/index.ts`
-4. Add tests in `tests/fulfillment/`
+2. Add operation method to `src/clients/fulfillment.ts`
+3. Export from `src/clients/index.ts` (if new types needed)
+4. Add tests in `tests/unit/clients/fulfillment.test.ts`
 
 ### Adding a New Inventory Operation
 
 1. Add request/response types to `src/types/inventory/`
-2. Add operation method to `src/inventory/client.ts`
-3. Export from `src/inventory/index.ts`
-4. Add tests in `tests/unit/inventory/` and `tests/integration/mock/inventory.test.ts`
+2. Add operation method to `src/clients/inventory.ts`
+3. Export from `src/clients/index.ts` (if new types needed)
+4. Add tests in `tests/unit/clients/inventory.test.ts` and `tests/integration/mock/inventory.test.ts`
 
 ### Adding a New Account Operation
 
 1. Add request/response types to `src/types/account/`
-2. Add operation method to `src/account/client.ts`
-3. Export from `src/account/index.ts`
-4. Add tests in `tests/unit/account/` and `tests/integration/mock/account.test.ts`
+2. Add operation method to `src/clients/account.ts`
+3. Export from `src/clients/index.ts` (if new types needed)
+4. Add tests in `tests/unit/clients/account.test.ts` and `tests/integration/mock/account.test.ts`
 
 ### Adding a New Taxonomy Operation
 
 1. Add request/response types to `src/types/taxonomy/`
-2. Add operation method to `src/taxonomy/client.ts`
-3. Export from `src/taxonomy/index.ts`
-4. Add tests in `tests/unit/taxonomy/` and `tests/integration/mock/taxonomy.test.ts`
+2. Add operation method to `src/clients/taxonomy.ts`
+3. Export from `src/clients/index.ts` (if new types needed)
+4. Add tests in `tests/unit/clients/taxonomy.test.ts` and `tests/integration/mock/taxonomy.test.ts`
 
 ### Adding a New Compliance Operation
 
 1. Add request/response types to `src/types/compliance/`
-2. Add operation method to `src/compliance/client.ts`
-3. Export from `src/compliance/index.ts`
-4. Add tests in `tests/unit/compliance/` and `tests/integration/mock/compliance.test.ts`
+2. Add operation method to `src/clients/compliance.ts`
+3. Export from `src/clients/index.ts` (if new types needed)
+4. Add tests in `tests/unit/clients/compliance.test.ts` and `tests/integration/mock/compliance.test.ts`
 
 ### Adding a New Notification Event Type
 
@@ -429,26 +430,14 @@ import { Generated } from '@andronics/ebay-client/types/compliance';
 │   │   ├── index.ts
 │   │   ├── base-client.ts          # BaseClient abstract class
 │   │   └── base-rest-client.ts     # BaseRestClient for REST APIs
-│   ├── trading/
-│   │   ├── index.ts
-│   │   ├── client.ts               # TradingClient (extends BaseClient)
-│   │   ├── operations.ts           # Typed operation methods
-│   │   └── xml.ts                  # XML builder/parser
-│   ├── fulfillment/
-│   │   ├── index.ts
-│   │   └── client.ts               # FulfillmentClient (extends BaseRestClient)
-│   ├── inventory/
-│   │   ├── index.ts
-│   │   └── client.ts               # InventoryClient (extends BaseRestClient)
-│   ├── account/
-│   │   ├── index.ts
-│   │   └── client.ts               # AccountClient (extends BaseRestClient)
-│   ├── taxonomy/
-│   │   ├── index.ts
-│   │   └── client.ts               # TaxonomyClient (extends BaseRestClient)
-│   ├── compliance/
-│   │   ├── index.ts
-│   │   └── client.ts               # ComplianceClient (extends BaseRestClient)
+│   ├── clients/
+│   │   ├── index.ts                # Consolidated client exports
+│   │   ├── trading.ts              # TradingClient (extends BaseClient)
+│   │   ├── fulfillment.ts          # FulfillmentClient (extends BaseRestClient)
+│   │   ├── inventory.ts            # InventoryClient (extends BaseRestClient)
+│   │   ├── account.ts              # AccountClient (extends BaseRestClient)
+│   │   ├── taxonomy.ts             # TaxonomyClient (extends BaseRestClient)
+│   │   └── compliance.ts           # ComplianceClient (extends BaseRestClient)
 │   ├── notifications/
 │   │   ├── index.ts
 │   │   ├── parser.ts               # Parse notification XML
@@ -489,13 +478,18 @@ import { Generated } from '@andronics/ebay-client/types/compliance';
     ├── utils/
     │   └── test-helpers.ts         # Shared test utilities
     ├── unit/
-    │   ├── trading/
-    │   ├── fulfillment/
-    │   ├── inventory/
-    │   ├── account/
-    │   ├── taxonomy/
-    │   ├── compliance/
-    │   └── notifications/
+    │   ├── clients/                # Client unit tests
+    │   │   ├── trading.test.ts
+    │   │   ├── fulfillment.test.ts
+    │   │   ├── inventory.test.ts
+    │   │   ├── account.test.ts
+    │   │   ├── taxonomy.test.ts
+    │   │   └── compliance.test.ts
+    │   ├── auth/
+    │   ├── errors/
+    │   ├── notifications/
+    │   ├── utils/
+    │   └── fixtures/               # Test fixture data
     └── integration/
         └── mock/
             ├── handlers/           # MSW request handlers
