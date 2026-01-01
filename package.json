@@ -1,0 +1,92 @@
+{
+  "name": "@andronics/ebay-client",
+  "version": "0.1.0",
+  "description": "Pure library for eBay API integration - Trading (XML) and Fulfillment (REST) APIs with notification handling",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./trading": {
+      "types": "./dist/trading/index.d.ts",
+      "import": "./dist/trading/index.js"
+    },
+    "./fulfillment": {
+      "types": "./dist/fulfillment/index.d.ts",
+      "import": "./dist/fulfillment/index.js"
+    },
+    "./notifications": {
+      "types": "./dist/notifications/index.d.ts",
+      "import": "./dist/notifications/index.js"
+    },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js"
+    },
+    "./types/trading": {
+      "types": "./dist/types/trading/index.d.ts",
+      "import": "./dist/types/trading/index.js"
+    },
+    "./types/fulfillment": {
+      "types": "./dist/types/fulfillment/index.d.ts",
+      "import": "./dist/types/fulfillment/index.js"
+    },
+    "./types/notifications": {
+      "types": "./dist/types/notifications/index.d.ts",
+      "import": "./dist/types/notifications/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors/index.d.ts",
+      "import": "./dist/errors/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "clean": "rm -rf dist",
+    "generate:types": "tsx scripts/generate-types.ts",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "ebay",
+    "ebay-api",
+    "trading-api",
+    "fulfillment-api",
+    "soap",
+    "xml",
+    "rest",
+    "notifications"
+  ],
+  "author": "Andronics",
+  "license": "MIT",
+  "dependencies": {
+    "fast-xml-parser": "^4.3.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.1",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.2",
+    "vitest": "^1.0.4",
+    "wsdl-tsclient": "^1.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
