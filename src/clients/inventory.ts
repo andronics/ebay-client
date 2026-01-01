@@ -1,0 +1,225 @@
+import type { InventoryClientConfig } from '../types/config.js';
+import { BaseRestClient } from '../base/index.js';
+
+import type {
+  InventoryItem,
+  InventoryItemsResponse,
+  CreateOrReplaceInventoryItemRequest,
+  Offer,
+  OffersResponse,
+  CreateOfferRequest,
+  CreateOfferResponse,
+  UpdateOfferRequest,
+  PublishOfferResponse,
+} from '../types/inventory/index.js';
+
+// ============================================================================
+// Parameter Types
+// ============================================================================
+
+/**
+ * Parameters for getInventoryItems.
+ */
+export interface GetInventoryItemsParams {
+  /** Maximum number of items to return (1-100) */
+  limit?: number;
+  /** Offset for pagination */
+  offset?: number;
+}
+
+/**
+ * Parameters for getOffers.
+ */
+export interface GetOffersParams {
+  /** Filter by SKU */
+  sku?: string;
+  /** Filter by marketplace */
+  marketplaceId?: string;
+  /** Filter by format (FIXED_PRICE, AUCTION) */
+  format?: string;
+  /** Maximum number to return (1-200) */
+  limit?: number;
+  /** Offset for pagination */
+  offset?: number;
+}
+
+/**
+ * API path for the Inventory API.
+ */
+const API_PATH = '/sell/inventory/v1';
+
+// ============================================================================
+// Client Class
+// ============================================================================
+
+/**
+ * Client for eBay Inventory API (REST-based).
+ *
+ * The Inventory API allows sellers to manage inventory items and offers.
+ * Inventory items represent products, while offers connect inventory items
+ * to eBay listings on specific marketplaces.
+ *
+ * @example
+ * ```typescript
+ * const client = new InventoryClient({
+ *   sandbox: false,
+ *   auth: {
+ *     type: 'oauth',
+ *     accessToken: 'your-access-token',
+ *   },
+ * });
+ *
+ * // Create an inventory item
+ * await client.createOrReplaceInventoryItem('SKU123', {
+ *   product: { title: 'My Product' },
+ *   condition: 'NEW',
+ *   availability: { shipToLocationAvailability: { quantity: 10 } },
+ * });
+ *
+ * // Create and publish an offer
+ * const { offerId } = await client.createOffer({
+ *   sku: 'SKU123',
+ *   marketplaceId: 'EBAY_GB',
+ *   pricingSummary: { price: { value: '29.99', currency: 'GBP' } },
+ * });
+ * await client.publishOffer(offerId);
+ * ```
+ */
+export class InventoryClient extends BaseRestClient<InventoryClientConfig> {
+  constructor(config: InventoryClientConfig) {
+    super(config, API_PATH);
+  }
+
+  // ===========================================================================
+  // Inventory Item Operations
+  // ===========================================================================
+
+  /**
+   * Create or replace an inventory item.
+   *
+   * @param sku - The seller-defined SKU
+   * @param item - The inventory item data
+   */
+  async createOrReplaceInventoryItem(
+    sku: string,
+    item: CreateOrReplaceInventoryItemRequest
+  ): Promise<void> {
+    const path = `/inventory_item/${encodeURIComponent(sku)}`;
+    await this.request<void>('PUT', path, { body: item });
+  }
+
+  /**
+   * Get an inventory item by SKU.
+   *
+   * @param sku - The seller-defined SKU
+   */
+  async getInventoryItem(sku: string): Promise<InventoryItem> {
+    const path = `/inventory_item/${encodeURIComponent(sku)}`;
+    return this.request<InventoryItem>('GET', path);
+  }
+
+  /**
+   * Delete an inventory item.
+   *
+   * @param sku - The seller-defined SKU
+   */
+  async deleteInventoryItem(sku: string): Promise<void> {
+    const path = `/inventory_item/${encodeURIComponent(sku)}`;
+    await this.request<void>('DELETE', path);
+  }
+
+  /**
+   * Get a list of inventory items.
+   *
+   * @param params - Query parameters
+   */
+  async getInventoryItems(params: GetInventoryItemsParams = {}): Promise<InventoryItemsResponse> {
+    const queryParams = new URLSearchParams();
+
+    if (params.limit) {
+      queryParams.set('limit', String(Math.min(Math.max(1, params.limit), 100)));
+    }
+    if (params.offset) {
+      queryParams.set('offset', String(params.offset));
+    }
+
+    const queryString = queryParams.toString();
+    const path = `/inventory_item${queryString ? `?${queryString}` : ''}`;
+
+    return this.request<InventoryItemsResponse>('GET', path);
+  }
+
+  // ===========================================================================
+  // Offer Operations
+  // ===========================================================================
+
+  /**
+   * Create an offer for an inventory item.
+   *
+   * @param offer - The offer data
+   */
+  async createOffer(offer: CreateOfferRequest): Promise<CreateOfferResponse> {
+    return this.request<CreateOfferResponse>('POST', '/offer', { body: offer });
+  }
+
+  /**
+   * Get an offer by ID.
+   *
+   * @param offerId - The eBay offer ID
+   */
+  async getOffer(offerId: string): Promise<Offer> {
+    const path = `/offer/${encodeURIComponent(offerId)}`;
+    return this.request<Offer>('GET', path);
+  }
+
+  /**
+   * Update an existing offer.
+   *
+   * @param offerId - The eBay offer ID
+   * @param offer - The updated offer data
+   */
+  async updateOffer(offerId: string, offer: UpdateOfferRequest): Promise<void> {
+    const path = `/offer/${encodeURIComponent(offerId)}`;
+    await this.request<void>('PUT', path, { body: offer });
+  }
+
+  /**
+   * Publish an offer to create a live listing.
+   *
+   * @param offerId - The eBay offer ID
+   */
+  async publishOffer(offerId: string): Promise<PublishOfferResponse> {
+    const path = `/offer/${encodeURIComponent(offerId)}/publish`;
+    return this.request<PublishOfferResponse>('POST', path);
+  }
+
+  /**
+   * Get a list of offers.
+   *
+   * @param params - Query parameters
+   */
+  async getOffers(params: GetOffersParams = {}): Promise<OffersResponse> {
+    const queryParams = new URLSearchParams();
+
+    if (params.sku) {
+      queryParams.set('sku', params.sku);
+    }
+    if (params.marketplaceId) {
+      queryParams.set('marketplace_id', params.marketplaceId);
+    }
+    if (params.format) {
+      queryParams.set('format', params.format);
+    }
+    if (params.limit) {
+      queryParams.set('limit', String(Math.min(Math.max(1, params.limit), 200)));
+    }
+    if (params.offset) {
+      queryParams.set('offset', String(params.offset));
+    }
+
+    const queryString = queryParams.toString();
+    const path = `/offer${queryString ? `?${queryString}` : ''}`;
+
+    return this.request<OffersResponse>('GET', path);
+  }
+}
