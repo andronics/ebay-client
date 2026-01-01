@@ -1,3 +1,7 @@
+// Base client classes
+export { BaseClient, BaseRestClient } from './base/index.js';
+export type { BaseClientConfig, RestClientConfig, RestApiError } from './base/index.js';
+
 // Main client exports
 export { TradingClient } from './trading/index.js';
 export { FulfillmentClient } from './fulfillment/index.js';

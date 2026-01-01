@@ -1,5 +1,9 @@
 import type { RetryConfig } from '../utils/http.js';
 
+// Note: BaseClientConfig and RestClientConfig are available from '../base/index.js'
+// The individual client configs below are kept for backwards compatibility
+// and are structurally compatible with RestClientConfig.
+
 /**
  * Auth'n'Auth (legacy) authentication configuration.
  * Used for Trading API with long-lived tokens.

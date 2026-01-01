@@ -10,6 +10,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./base": {
+      "types": "./dist/base/index.d.ts",
+      "import": "./dist/base/index.js"
+    },
     "./trading": {
       "types": "./dist/trading/index.d.ts",
       "import": "./dist/trading/index.js"
