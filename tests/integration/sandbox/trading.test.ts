@@ -40,17 +40,22 @@ describeIfSandbox('Trading API Sandbox (Real API)', () => {
         Item: {
           Title: 'Integration Test Item - DO NOT BID',
           Description: '<![CDATA[<p>This is an integration test item. Do not bid.</p>]]>',
-          PrimaryCategory: { CategoryID: '11450' }, // Coins
+          PrimaryCategory: { CategoryID: '139971' }, // Collectables > Decorative Ornaments & Plates > Other
           StartPrice: 9.99,
           Quantity: 1,
-          ListingDuration: 'Days_7',
+          ListingDuration: 'GTC', // Good 'Til Cancelled - required for FixedPriceItem
           ListingType: 'FixedPriceItem',
           Country: 'GB',
           Currency: 'GBP',
+          Location: 'London',
           ConditionID: 1000, // New
-          PaymentMethods: 'PayPal',
-          PayPalEmailAddress: 'test@example.com',
           DispatchTimeMax: 3,
+          ItemSpecifics: {
+            NameValueList: [
+              { Name: 'Brand', Value: 'Unbranded' },
+              { Name: 'Model', Value: 'N/A' },
+            ],
+          },
           ShippingDetails: {
             ShippingType: 'Flat',
             ShippingServiceOptions: {
@@ -60,7 +65,6 @@ describeIfSandbox('Trading API Sandbox (Real API)', () => {
           },
           ReturnPolicy: {
             ReturnsAcceptedOption: 'ReturnsAccepted',
-            RefundOption: 'MoneyBack',
             ReturnsWithinOption: 'Days_30',
             ShippingCostPaidByOption: 'Buyer',
           },
@@ -76,17 +80,22 @@ describeIfSandbox('Trading API Sandbox (Real API)', () => {
         Item: {
           Title: 'Integration Test Item - DO NOT BID - ' + Date.now(),
           Description: '<![CDATA[<p>This is an integration test item. Do not bid.</p>]]>',
-          PrimaryCategory: { CategoryID: '11450' }, // Coins
+          PrimaryCategory: { CategoryID: '139971' }, // Collectables > Decorative Ornaments & Plates > Other
           StartPrice: 9.99,
           Quantity: 1,
-          ListingDuration: 'Days_7',
+          ListingDuration: 'GTC', // Good 'Til Cancelled - required for FixedPriceItem
           ListingType: 'FixedPriceItem',
           Country: 'GB',
           Currency: 'GBP',
+          Location: 'London',
           ConditionID: 1000, // New
-          PaymentMethods: 'PayPal',
-          PayPalEmailAddress: 'test@example.com',
           DispatchTimeMax: 3,
+          ItemSpecifics: {
+            NameValueList: [
+              { Name: 'Brand', Value: 'Unbranded' },
+              { Name: 'Model', Value: 'N/A' },
+            ],
+          },
           ShippingDetails: {
             ShippingType: 'Flat',
             ShippingServiceOptions: {
@@ -96,7 +105,6 @@ describeIfSandbox('Trading API Sandbox (Real API)', () => {
           },
           ReturnPolicy: {
             ReturnsAcceptedOption: 'ReturnsAccepted',
-            RefundOption: 'MoneyBack',
             ReturnsWithinOption: 'Days_30',
             ShippingCostPaidByOption: 'Buyer',
           },
