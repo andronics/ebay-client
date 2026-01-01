@@ -5,6 +5,7 @@ export type {
   AuthConfig,
   TradingClientConfig,
   FulfillmentClientConfig,
+  InventoryClientConfig,
   EbaySiteIdValue,
 } from './config.js';
 
@@ -12,6 +13,7 @@ export {
   EbaySiteId,
   getTradingEndpoint,
   getFulfillmentEndpoint,
+  getInventoryEndpoint,
 } from './config.js';
 
 // Trading types (Generated namespace excluded - import from types/trading directly)
@@ -76,6 +78,44 @@ export type {
 } from './fulfillment/index.js';
 
 export { ShippingCarriers } from './fulfillment/index.js';
+
+// Inventory types (Generated namespace excluded - import from types/inventory directly)
+export type {
+  ConditionEnum,
+  PackageType,
+  WeightUnitOfMeasure,
+  LengthUnitOfMeasure,
+  Amount as InventoryAmount,
+  Aspects,
+  Product,
+  Dimensions,
+  Weight,
+  PackageWeightAndSize,
+  TimeDuration,
+  AvailabilityDistribution,
+  ShipToLocationAvailability,
+  PickupAtLocationAvailability,
+  Availability,
+  InventoryItem,
+  CreateOrReplaceInventoryItemRequest,
+  InventoryItemsResponse,
+  OfferStatusEnum,
+  FormatType,
+  MarketplaceIdEnum,
+  ListingDurationEnum,
+  PricingSummary,
+  ShippingCostOverride,
+  BestOffer,
+  ListingPolicies,
+  Tax,
+  ListingDetails,
+  Offer,
+  CreateOfferRequest,
+  CreateOfferResponse,
+  UpdateOfferRequest,
+  PublishOfferResponse,
+  OffersResponse,
+} from './inventory/index.js';
 
 // Notification types
 export * from './notifications/index.js';

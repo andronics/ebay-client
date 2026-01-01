@@ -18,6 +18,10 @@
       "types": "./dist/fulfillment/index.d.ts",
       "import": "./dist/fulfillment/index.js"
     },
+    "./inventory": {
+      "types": "./dist/inventory/index.d.ts",
+      "import": "./dist/inventory/index.js"
+    },
     "./notifications": {
       "types": "./dist/notifications/index.d.ts",
       "import": "./dist/notifications/index.js"
@@ -37,6 +41,10 @@
     "./types/fulfillment": {
       "types": "./dist/types/fulfillment/index.d.ts",
       "import": "./dist/types/fulfillment/index.js"
+    },
+    "./types/inventory": {
+      "types": "./dist/types/inventory/index.d.ts",
+      "import": "./dist/types/inventory/index.js"
     },
     "./types/notifications": {
       "types": "./dist/types/notifications/index.d.ts",
@@ -66,7 +74,8 @@
     "clean": "rm -rf dist",
     "generate:trading": "tsx scripts/generate-trading-types.ts",
     "generate:fulfillment": "tsx scripts/generate-fulfillment-types.ts",
-    "generate:all": "npm run generate:trading && npm run generate:fulfillment",
+    "generate:inventory": "tsx scripts/generate-inventory-types.ts",
+    "generate:all": "npm run generate:trading && npm run generate:fulfillment && npm run generate:inventory",
     "prepublishOnly": "npm run clean && npm run build",
     "prepare": "husky"
   },

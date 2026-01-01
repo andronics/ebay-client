@@ -6,11 +6,12 @@
 
 **@andronics/ebay-client** is a pure TypeScript library for eBay API integration. It is **NOT a server** - it's designed to be used by serverless functions (Google Cloud Functions, AWS Lambda, etc.) and other Node.js applications.
 
-### Two Core Capabilities
+### Three Core Capabilities
 
 1. **Outbound** - Make API calls to eBay
    - Trading API (legacy XML-based)
    - Fulfillment API (modern REST-based)
+   - Inventory API (modern REST-based)
 
 2. **Inbound** - Handle eBay notifications
    - Parse notification XML
@@ -31,9 +32,10 @@
 @andronics/ebay-client/
 ├── trading/        → TradingClient (XML over HTTP)
 ├── fulfillment/    → FulfillmentClient (REST)
+├── inventory/      → InventoryClient (REST)
 ├── notifications/  → Parse, validate, verify inbound events
 ├── auth/           → Auth'n'Auth + OAuth implementations
-├── types/          → Clean WSDL-generated types
+├── types/          → Clean WSDL/OpenAPI-generated types
 ├── errors/         → Error class hierarchy
 └── utils/          → XML utilities, HTTP wrapper
 ```
@@ -48,6 +50,10 @@ Consumer Code
      │        └── utils/http ────── errors/
      │
      ├── FulfillmentClient ──┬── auth/oauth
+     │        │              └── utils/http
+     │        └── errors/
+     │
+     ├── InventoryClient ────┬── auth/oauth
      │        │              └── utils/http
      │        └── errors/
      │
@@ -104,6 +110,28 @@ Headers:
   Content-Type: application/json
 ```
 
+### Inventory API (Modern REST)
+
+REST API for managing inventory items and offers:
+
+```
+PUT https://api.ebay.com/sell/inventory/v1/inventory_item/{sku}
+Headers:
+  Authorization: Bearer <access-token>
+  Content-Type: application/json
+Body:
+  {
+    "product": { "title": "Item Title", ... },
+    "condition": "NEW",
+    "availability": { "shipToLocationAvailability": { "quantity": 10 } }
+  }
+```
+
+**Inventory workflow:**
+1. Create/update inventory item (product data, condition, availability)
+2. Create offer (pricing, policies, marketplace)
+3. Publish offer (makes listing live on eBay)
+
 ### Notification Flow
 
 eBay sends platform notifications as XML POSTs:
@@ -135,7 +163,8 @@ npm run dev
 # Generate types from eBay specs
 npm run generate:trading      # Trading API (WSDL)
 npm run generate:fulfillment  # Fulfillment API (OpenAPI)
-npm run generate:all          # Both
+npm run generate:inventory    # Inventory API (OpenAPI)
+npm run generate:all          # All APIs
 ```
 
 ## Common Tasks
@@ -153,6 +182,13 @@ npm run generate:all          # Both
 2. Add operation method to `src/fulfillment/operations.ts`
 3. Export from `src/fulfillment/index.ts`
 4. Add tests in `tests/fulfillment/`
+
+### Adding a New Inventory Operation
+
+1. Add request/response types to `src/types/inventory/`
+2. Add operation method to `src/inventory/client.ts`
+3. Export from `src/inventory/index.ts`
+4. Add tests in `tests/unit/inventory/` and `tests/integration/mock/inventory.test.ts`
 
 ### Adding a New Notification Event Type
 
@@ -183,7 +219,15 @@ npm run generate:fulfillment
 - Uses `openapi-typescript` to generate types
 - Output: `src/types/fulfillment/generated/`
 
-**Both at once:**
+**Inventory API (OpenAPI → TypeScript)**
+```bash
+npm run generate:inventory
+```
+- Downloads OpenAPI spec from eBay Developer Portal
+- Uses `openapi-typescript` to generate types
+- Output: `src/types/inventory/generated/`
+
+**All APIs at once:**
 ```bash
 npm run generate:all
 ```
@@ -192,6 +236,7 @@ Access generated types via the `Generated` namespace:
 ```typescript
 import { Generated } from '@andronics/ebay-client/types/trading';
 import { Generated } from '@andronics/ebay-client/types/fulfillment';
+import { Generated } from '@andronics/ebay-client/types/inventory';
 ```
 
 ## Gotchas & Edge Cases
@@ -235,8 +280,10 @@ import { Generated } from '@andronics/ebay-client/types/fulfillment';
 │   │   └── xml.ts                  # XML builder/parser
 │   ├── fulfillment/
 │   │   ├── index.ts
-│   │   ├── client.ts               # FulfillmentClient class
-│   │   └── operations.ts           # Typed operation methods
+│   │   └── client.ts               # FulfillmentClient class
+│   ├── inventory/
+│   │   ├── index.ts
+│   │   └── client.ts               # InventoryClient class
 │   ├── notifications/
 │   │   ├── index.ts
 │   │   ├── parser.ts               # Parse notification XML
@@ -252,6 +299,7 @@ import { Generated } from '@andronics/ebay-client/types/fulfillment';
 │   │   ├── config.ts               # Configuration types
 │   │   ├── trading/                # Trading types + generated/
 │   │   ├── fulfillment/            # Fulfillment types + generated/
+│   │   ├── inventory/              # Inventory types + generated/
 │   │   └── notifications/          # Notification event types
 │   ├── errors/
 │   │   ├── index.ts
@@ -264,12 +312,20 @@ import { Generated } from '@andronics/ebay-client/types/fulfillment';
 │       └── xml.ts                  # Shared XML utilities
 ├── scripts/
 │   ├── generate-trading-types.ts   # WSDL type generation
-│   └── generate-fulfillment-types.ts # OpenAPI type generation
+│   ├── generate-fulfillment-types.ts # OpenAPI type generation
+│   └── generate-inventory-types.ts # OpenAPI type generation
 └── tests/
-    ├── trading/
-    ├── fulfillment/
-    ├── notifications/
-    └── mocks/
+    ├── unit/
+    │   ├── trading/
+    │   ├── fulfillment/
+    │   ├── inventory/
+    │   └── notifications/
+    └── integration/
+        └── mock/
+            ├── handlers/           # MSW request handlers
+            ├── trading.test.ts
+            ├── inventory.test.ts
+            └── notifications.test.ts
 ```
 
 ## Related Context
