@@ -19,3 +19,7 @@ export type {
 } from './shipping.js';
 
 export { ShippingCarriers } from './shipping.js';
+
+// Full OpenAPI-generated types (for reference during development)
+// These provide complete eBay Fulfillment API schema coverage
+export * as Generated from './generated/index.js';

@@ -132,8 +132,10 @@ npm run typecheck
 # Watch mode during development
 npm run dev
 
-# Generate types from WSDL (requires wsdl/ directory)
-npm run generate:types
+# Generate types from eBay specs
+npm run generate:trading      # Trading API (WSDL)
+npm run generate:fulfillment  # Fulfillment API (OpenAPI)
+npm run generate:all          # Both
 ```
 
 ## Common Tasks
@@ -159,21 +161,38 @@ npm run generate:types
 3. Add Zod schema in `src/notifications/validator.ts`
 4. Add tests in `tests/notifications/`
 
-### Regenerating WSDL Types
+### Regenerating API Types
 
+Two type generation pipelines exist for the different API specs:
+
+**Trading API (WSDL → TypeScript)**
 ```bash
-# Download latest WSDL
-curl -o wsdl/ebaySvc.wsdl https://developer.ebay.com/webservices/latest/ebaySvc.wsdl
+npm run generate:trading
+```
+- Downloads WSDL from `developer.ebay.com/webservices/latest/ebaySvc.wsdl`
+- Uses `wsdl-tsclient` to generate raw types
+- Post-processes to clean names (`NsaddItemResponseType` → `AddItemResponse`)
+- Adds `.js` extensions for ESM
+- Output: `src/types/trading/generated/`
 
-# Generate and clean types
-npm run generate:types
+**Fulfillment API (OpenAPI → TypeScript)**
+```bash
+npm run generate:fulfillment
+```
+- Downloads OpenAPI spec from eBay Developer Portal
+- Uses `openapi-typescript` to generate types
+- Output: `src/types/fulfillment/generated/`
+
+**Both at once:**
+```bash
+npm run generate:all
 ```
 
-The generation script:
-1. Runs `wsdl-tsclient` on the WSDL
-2. Removes `Ns` prefix and `Type` suffix from type names
-3. Adds `.js` extensions to imports (ESM)
-4. Generates barrel exports
+Access generated types via the `Generated` namespace:
+```typescript
+import { Generated } from '@andronics/ebay-client/types/trading';
+import { Generated } from '@andronics/ebay-client/types/fulfillment';
+```
 
 ## Gotchas & Edge Cases
 
@@ -231,8 +250,8 @@ The generation script:
 │   ├── types/
 │   │   ├── index.ts
 │   │   ├── config.ts               # Configuration types
-│   │   ├── trading/                # WSDL-generated types
-│   │   ├── fulfillment/            # REST API types
+│   │   ├── trading/                # Trading types + generated/
+│   │   ├── fulfillment/            # Fulfillment types + generated/
 │   │   └── notifications/          # Notification event types
 │   ├── errors/
 │   │   ├── index.ts
@@ -244,7 +263,8 @@ The generation script:
 │       ├── http.ts                 # Fetch wrapper with retry
 │       └── xml.ts                  # Shared XML utilities
 ├── scripts/
-│   └── generate-types.ts           # WSDL type generation
+│   ├── generate-trading-types.ts   # WSDL type generation
+│   └── generate-fulfillment-types.ts # OpenAPI type generation
 └── tests/
     ├── trading/
     ├── fulfillment/
