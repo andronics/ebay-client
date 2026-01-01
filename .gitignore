@@ -41,11 +41,12 @@ pnpm-debug.log*
 # Turbo
 .turbo/
 
-# WSDL files (downloaded, not committed)
+# API specs (downloaded, not committed)
 wsdl/
+openapi/
 
 # Generated types are now committed for dev-time reference
-# Regenerate with: npm run generate:types
+# Regenerate with: npm run generate:all
 
 # Temporary files
 *.tmp
