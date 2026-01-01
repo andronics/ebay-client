@@ -140,7 +140,7 @@ export interface UserDeliveryPreferenceArrayType {
 /**
  * SetNotificationPreferences response.
  */
-export interface SetNotificationPreferencesResponse extends BaseResponse {}
+export type SetNotificationPreferencesResponse = BaseResponse;
 
 /**
  * GetNotificationPreferences response.
